@@ -155,6 +155,9 @@ Les {2} autres pages seront supprimées définitivement.
   <data name="AboutDevelopedBy" xml:space="preserve">
     <value>Développé par </value>
   </data>
+  <data name="AboutSourceCode" xml:space="preserve">
+    <value>Code source sur GitHub</value>
+  </data>
   <data name="PrintTooltip" xml:space="preserve">
     <value>Imprimer la zone sélectionnée, sans enregistrer (Ctrl+P)</value>
   </data>

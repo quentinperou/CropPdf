@@ -155,6 +155,9 @@ Overwrite the original file?</value>
   <data name="AboutDevelopedBy" xml:space="preserve">
     <value>Developed by </value>
   </data>
+  <data name="AboutSourceCode" xml:space="preserve">
+    <value>Source code on GitHub</value>
+  </data>
   <data name="PrintTooltip" xml:space="preserve">
     <value>Print the selected area, without saving (Ctrl+P)</value>
   </data>

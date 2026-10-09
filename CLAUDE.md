@@ -25,12 +25,18 @@ The repository is public and CI passes on push (tests, full build, installer upl
 artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
 `CropPdf-Setup-1.0.0.exe` in the GitHub Release (release notes: only the auto-generated changelog link).
 
-**Updates (not released yet, after 1.0.0)**: startup check of the GitHub Releases, “new version” bar in the main
-window, *Updates* card in Settings (status, check/update button, startup-check toggle, Stable/Beta channel),
-download + SHA-256 check + silent install that closes and restarts the app; beta tags published as pre-releases.
-61 unit tests pass (versions, channels, feed parsing, checksum, download). Checked on screen through UI Automation
-with a build versioned 0.9.0 (bar and card show “1.0.0 available”) and with 1.0.0 (“up to date”), light/dark,
-English/French. The beta installer compiles (`1.1.0-beta.1` → file version `1.1.0`).
+**Updates, released as `v1.1.0-beta.1` (pre-release, Beta channel only; Stable “latest” is still 1.0.0)**:
+startup check of the GitHub Releases, “new version” bar in the main window, *Updates* card in Settings (status,
+check/update button, startup-check toggle, Stable/Beta channel), download + SHA-256 check + silent install that
+closes and restarts the app; beta tags published as pre-releases (verified: the `v1.1.0-beta.1` tag gave a
+pre-release). 61 unit tests pass (versions, channels, feed parsing, checksum, download). Checked on screen through
+UI Automation with a build versioned 0.9.0 (“1.0.0 available”) and with 1.0.0 (“up to date”), light/dark,
+English/French. **Update path tested by the author**: a 0.9.0 build (run from outside the install folder) on the
+Beta channel offered 1.1.0-beta.1, downloaded it, installed it after UAC (first install on this PC: package
+`Status : Ok`, classic verb registered) and the installed beta started; it then removed `%TEMP%\CropPdf-Update`.
+
+**v1.1.0 (stable)**: the update system of 1.1.0-beta.1, plus a “Source code on GitHub” link in the About card.
+Users of 1.0.0 install it by hand once (1.0.0 has no update check); later versions are offered by the app.
 
 Not verified yet:
 - printing on a physical printer, especially shipping labels on a label printer (the main use case);
@@ -39,12 +45,15 @@ Not verified yet:
 - Windows 10 (classic menu only);
 - UAC answered with a *different* administrator account: the package is then registered for that account only;
 - installing from the Release download (SmartScreen “Mark of the Web” path) on a clean PC;
-- the update installation itself (download, UAC, Restart Manager closing the app, relaunch as the user) and the
-  pre-release workflow: only a real release can exercise them.
+- updating an *installed* copy: the Restart Manager closing the running app before replacing its files (the
+  test above ran from another folder, so the app closed itself after the installer's exit code 0), declining
+  the UAC prompt (“not installed” message), and the relaunched app being unelevated (`runasoriginaluser`, not
+  checked: the app was already closed when looked at).
 
 Next steps:
-1. Release the update system as a beta (e.g. `v1.1.0-beta.1`) and test the whole update path with it: an older
-   build on the Beta channel must download, install and restart into the beta.
+1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
+   path and the relaunch; also try declining the UAC prompt once.
+2. Print shipping labels on the label printer (the main use case, see “Not verified yet”).
 
 ## Commands
 
@@ -160,6 +169,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 - **Code, comments, docs, scripts and commit messages in English.** User-facing texts go through the resources
   (English + French). The README exists in English and French: keep both in sync.
+- **Release notes** (GitHub Releases) are written in English only (since v1.1.0-beta.1; v1.0.0 is bilingual).
+  They describe the changes, how to install (SmartScreen, UAC) and give the installer's SHA-256 (asset `digest`).
 - Comments explain *why*, not *what*.
 - `.ps1` and `.iss` files are **UTF-8 with BOM** and CRLF (Windows PowerShell 5.1 and Inno Setup misread
   BOM-less UTF-8), see `.editorconfig`. Scripts must stay compatible with Windows PowerShell 5.1.

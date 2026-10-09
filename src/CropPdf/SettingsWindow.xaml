@@ -148,6 +148,10 @@
             <Run Text="{local:Tr AboutDevelopedBy}" /><Hyperlink NavigateUri="https://github.com/quentinperou"
                 RequestNavigate="Link_RequestNavigate">QuentinPerou</Hyperlink>
           </TextBlock>
+          <TextBlock Style="{StaticResource CardDescription}">
+            <Hyperlink NavigateUri="https://github.com/quentinperou/CropPdf" RequestNavigate="Link_RequestNavigate"><Run
+                Text="{local:Tr AboutSourceCode}" /></Hyperlink>
+          </TextBlock>
         </StackPanel>
       </DockPanel>
     </Border>
