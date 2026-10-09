@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CropPdf.Core/CropPdf.Core.csproj" />
+    <Project Path="src/CropPdf/CropPdf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CropPdf.Tests/CropPdf.Tests.csproj" />
+  </Folder>
+</Solution>

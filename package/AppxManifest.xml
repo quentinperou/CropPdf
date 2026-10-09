@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Sparse" package (package with external location): it contains only this manifest and the logos.
+  It gives Crop PDF a package identity so that Windows 11 shows "Crop PDF" ("Recadrer le PDF") in the NEW
+  File Explorer context menu. The app files stay in the install folder, passed at registration:
+    Add-AppxPackage -Path CropPdf.Menu.msix -ExternalLocation <install folder> -AllowUnsigned
+
+  The package is not signed: the OID in Publisher marks it as an unsigned package, which Windows 11
+  installs with -AllowUnsigned from an elevated prompt (the installer does it).
+
+  Only bump Version when this file changes: the installer re-registers the package on every install.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap10 desktop4 desktop5 com rescap">
+
+  <Identity
+    Name="CropPdf.ContextMenu"
+    Publisher="CN=Crop PDF, OID.2.25.311729368913984317654407730594956997722=1"
+    Version="1.0.0.0"
+    ProcessorArchitecture="neutral" />
+
+  <Properties>
+    <DisplayName>Crop PDF</DisplayName>
+    <PublisherDisplayName>QuentinPerou</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="fr-fr" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+
+  <Applications>
+    <Application Id="CropPdf" Executable="CropPdf.exe" uap10:TrustLevel="mediumIL" uap10:RuntimeBehavior="win32App">
+      <uap:VisualElements
+        AppListEntry="none"
+        DisplayName="Crop PDF"
+        Description="Crop a PDF page from the File Explorer context menu"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+
+      <Extensions>
+        <!-- The menu entry, for .pdf files. -->
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+            <desktop5:ItemType Type=".pdf">
+              <desktop5:Verb Id="CropPdf" Clsid="5C9B0CAD-9A30-49DA-827A-1672AC5D7FB8" />
+            </desktop5:ItemType>
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+
+        <!-- The COM class behind it: CropPdfMenu.dll (src/CropPdf.Shell), loaded in a surrogate process. -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="Crop PDF context menu">
+              <com:Class Id="5C9B0CAD-9A30-49DA-827A-1672AC5D7FB8" Path="CropPdfMenu.dll" ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+</Package>

@@ -1,0 +1,208 @@
+<Window x:Class="CropPdf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CropPdf"
+        Title="{local:Tr AppTitle}"
+        Icon="/Assets/CropPdf.ico"
+        Width="1100" Height="820" MinWidth="820" MinHeight="480"
+        WindowStartupLocation="CenterScreen"
+        AllowDrop="True">
+
+  <Window.Resources>
+    <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <Style x:Key="Glyph" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="Label" TargetType="TextBlock">
+      <Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Borderless button, like the command bars of Windows 11 apps. -->
+    <Style x:Key="SubtleButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="Margin" Value="2,0" />
+    </Style>
+
+    <Style x:Key="ToolbarDivider" TargetType="Rectangle">
+      <Setter Property="Width" Value="1" />
+      <Setter Property="Height" Value="20" />
+      <Setter Property="Margin" Value="8,0" />
+      <Setter Property="Fill" Value="{DynamicResource DividerStrokeColorDefaultBrush}" />
+    </Style>
+  </Window.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- Command bar -->
+    <DockPanel Grid.Row="0" Margin="12,8" LastChildFill="False">
+      <Button x:Name="OpenButton" DockPanel.Dock="Left" Style="{StaticResource SubtleButton}"
+              Click="Open_Click" ToolTip="{local:Tr OpenTooltip}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource Glyph}" Text="&#xE8E5;" />
+          <TextBlock Style="{StaticResource Label}" Text="{local:Tr Open}" />
+        </StackPanel>
+      </Button>
+
+      <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Margin="8,0,0,0"
+              Click="Settings_Click" ToolTip="{local:Tr SettingsTooltip}"
+              AutomationProperties.Name="{local:Tr Settings}">
+        <TextBlock Style="{StaticResource Glyph}" Text="&#xE713;" />
+      </Button>
+
+      <StackPanel x:Name="DocumentCommands" DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Style="{StaticResource SubtleButton}" Click="ZoomOut_Click" ToolTip="{local:Tr ZoomOutTooltip}"
+                AutomationProperties.Name="{local:Tr ZoomOutTooltip}">
+          <TextBlock Style="{StaticResource Glyph}" Text="&#xE71F;" />
+        </Button>
+        <TextBlock x:Name="ZoomText" MinWidth="48" TextAlignment="Center" VerticalAlignment="Center" Text="100 %" />
+        <Button Style="{StaticResource SubtleButton}" Click="ZoomIn_Click" ToolTip="{local:Tr ZoomInTooltip}"
+                AutomationProperties.Name="{local:Tr ZoomInTooltip}">
+          <TextBlock Style="{StaticResource Glyph}" Text="&#xE8A3;" />
+        </Button>
+        <Button Style="{StaticResource SubtleButton}" Click="Fit_Click" ToolTip="{local:Tr FitTooltip}"
+                AutomationProperties.Name="{local:Tr FitTooltip}">
+          <TextBlock Style="{StaticResource Glyph}" Text="&#xE9A6;" />
+        </Button>
+
+        <Rectangle Style="{StaticResource ToolbarDivider}" />
+
+        <!-- Discreet on purpose: printing is secondary to saving. -->
+        <Button x:Name="PrintButton" Style="{StaticResource SubtleButton}" Margin="0,0,6,0" Click="Print_Click"
+                ToolTip="{local:Tr PrintTooltip}" AutomationProperties.Name="{local:Tr PrintTooltip}">
+          <Button.ContextMenu>
+            <ContextMenu x:Name="PrintMenu" Placement="Bottom">
+              <MenuItem x:Name="PrintFitItem" Header="{local:Tr PrintFit}" ToolTip="{local:Tr PrintFitTooltip}"
+                        Click="PrintFit_Click" />
+              <MenuItem x:Name="PrintActualSizeItem" Header="{local:Tr PrintActualSize}" ToolTip="{local:Tr PrintActualSizeTooltip}"
+                        Click="PrintActualSize_Click" />
+            </ContextMenu>
+          </Button.ContextMenu>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Glyph}" Text="&#xE749;" />
+            <TextBlock Style="{StaticResource Glyph}" FontSize="8" Margin="4,2,0,0" Text="&#xE70D;" />
+          </StackPanel>
+        </Button>
+
+        <Button x:Name="OverwriteButton" Padding="12,6" Margin="0,0,6,0"
+                Click="Overwrite_Click" ToolTip="{local:Tr OverwriteTooltip}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Glyph}" Text="&#xE74E;" />
+            <TextBlock Style="{StaticResource Label}" Text="{local:Tr Overwrite}" />
+          </StackPanel>
+        </Button>
+        <Button x:Name="SaveCopyButton" Style="{DynamicResource AccentButtonStyle}" Padding="12,6"
+                Click="SaveCopy_Click" ToolTip="{local:Tr SaveCopyTooltip}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Glyph}" Text="&#xE792;" />
+            <TextBlock Style="{StaticResource Label}" Text="{local:Tr SaveCopy}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </DockPanel>
+
+    <!-- Info bar (success / warning / error), styled like the WinUI InfoBar. -->
+    <Border x:Name="InfoBar" Grid.Row="1" Margin="12,0,12,8" Padding="14,6,6,6" CornerRadius="4"
+            BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" Visibility="Collapsed">
+      <DockPanel>
+        <TextBlock x:Name="InfoIcon" DockPanel.Dock="Left" Style="{StaticResource Glyph}" Margin="0,0,12,0" />
+        <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Padding="8" Click="CloseInfo_Click" ToolTip="{local:Tr Close}"
+                AutomationProperties.Name="{local:Tr Close}">
+          <TextBlock Style="{StaticResource Glyph}" FontSize="12" Text="&#xE711;" />
+        </Button>
+        <StackPanel x:Name="InfoActions" DockPanel.Dock="Right" Orientation="Horizontal" Margin="12,0,4,0">
+          <Button Content="{local:Tr OpenResult}" Margin="0,0,6,0" Click="OpenResult_Click" />
+          <Button Content="{local:Tr ShowInFolder}" Click="ShowInFolder_Click" />
+        </StackPanel>
+        <TextBlock x:Name="InfoText" VerticalAlignment="Center" TextWrapping="Wrap" />
+      </DockPanel>
+    </Border>
+
+    <!-- Pages -->
+    <Border Grid.Row="2" Background="{DynamicResource LayerFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="0,1">
+      <Grid>
+        <ItemsControl x:Name="PagesList" Focusable="False"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.CacheLength="1"
+                      VirtualizingPanel.CacheLengthUnit="Page"
+                      ScrollViewer.CanContentScroll="True"
+                      PreviewMouseWheel="PagesList_PreviewMouseWheel">
+          <ItemsControl.Template>
+            <ControlTemplate TargetType="ItemsControl">
+              <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False" CanContentScroll="True"
+                            HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter />
+              </ScrollViewer>
+            </ControlTemplate>
+          </ItemsControl.Template>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type local:PageItem}">
+              <StackPanel Margin="24,20,24,4" HorizontalAlignment="Center"
+                          Loaded="PageContainer_Loaded" Unloaded="PageContainer_Unloaded">
+                <Grid Width="{Binding DisplayWidth}" Height="{Binding DisplayHeight}">
+                  <Border Background="White">
+                    <Border.Effect>
+                      <DropShadowEffect BlurRadius="14" ShadowDepth="2" Direction="270" Opacity="0.25" />
+                    </Border.Effect>
+                  </Border>
+                  <Image Source="{Binding Image}" Stretch="Fill" RenderOptions.BitmapScalingMode="HighQuality" />
+                  <local:SelectionOverlay Selection="{Binding Selection, Mode=TwoWay}" />
+                </Grid>
+                <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" Margin="0,8,0,0" FontSize="12"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Shown when no document is open. -->
+        <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="440">
+          <TextBlock Style="{StaticResource Glyph}" FontSize="56" Text="&#xE7A8;" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+          <TextBlock Text="{local:Tr EmptyTitle}" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,16,0,6" />
+          <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                     Text="{local:Tr EmptyText}" />
+          <Button Style="{DynamicResource AccentButtonStyle}" HorizontalAlignment="Center" Margin="0,20,0,0"
+                  Padding="16,8" Content="{local:Tr OpenPdfButton}" Click="Open_Click" />
+        </StackPanel>
+
+        <ProgressBar x:Name="BusyBar" IsIndeterminate="True" VerticalAlignment="Top" Height="3"
+                     Visibility="Collapsed" IsHitTestVisible="False" />
+      </Grid>
+    </Border>
+
+    <!-- Status bar -->
+    <DockPanel Grid.Row="3" Margin="16,2,16,4" MinHeight="32">
+      <TextBlock x:Name="PageCountText" DockPanel.Dock="Right" VerticalAlignment="Center"
+                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+      <TextBlock x:Name="StatusText" DockPanel.Dock="Left" VerticalAlignment="Center"
+                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+      <Button x:Name="ClearButton" DockPanel.Dock="Left" HorizontalAlignment="Left" Style="{StaticResource SubtleButton}"
+              Padding="8,4" Margin="8,0,0,0" Click="ClearSelection_Click" ToolTip="{local:Tr ClearSelectionTooltip}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource Glyph}" FontSize="12" Text="&#xE894;" />
+          <TextBlock Style="{StaticResource Label}" Margin="6,0,0,0" Text="{local:Tr ClearSelection}" />
+        </StackPanel>
+      </Button>
+    </DockPanel>
+  </Grid>
+</Window>

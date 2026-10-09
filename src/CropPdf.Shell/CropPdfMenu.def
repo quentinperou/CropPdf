@@ -1,0 +1,4 @@
+LIBRARY CropPdfMenu
+EXPORTS
+    DllCanUnloadNow PRIVATE
+    DllGetClassObject PRIVATE

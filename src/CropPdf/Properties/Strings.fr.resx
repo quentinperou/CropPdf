@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- French translation of Strings.resx. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Recadrer un PDF</value>
+  </data>
+  <data name="WindowTitleWithFile" xml:space="preserve">
+    <value>{0} – Recadrer un PDF</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="OpenTooltip" xml:space="preserve">
+    <value>Ouvrir un PDF (Ctrl+O)</value>
+  </data>
+  <data name="ZoomOutTooltip" xml:space="preserve">
+    <value>Zoom arrière (Ctrl + molette)</value>
+  </data>
+  <data name="ZoomInTooltip" xml:space="preserve">
+    <value>Zoom avant (Ctrl + molette)</value>
+  </data>
+  <data name="FitTooltip" xml:space="preserve">
+    <value>Ajuster à la fenêtre (Ctrl+0)</value>
+  </data>
+  <data name="Overwrite" xml:space="preserve">
+    <value>Écraser l&apos;original</value>
+  </data>
+  <data name="OverwriteTooltip" xml:space="preserve">
+    <value>Remplace le fichier d&apos;origine par la version recadrée</value>
+  </data>
+  <data name="SaveCopy" xml:space="preserve">
+    <value>Enregistrer une copie</value>
+  </data>
+  <data name="SaveCopyTooltip" xml:space="preserve">
+    <value>Enregistre « nom_crop.pdf » à côté du fichier d&apos;origine (Ctrl+S)</value>
+  </data>
+  <data name="OpenResult" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="ShowInFolder" xml:space="preserve">
+    <value>Afficher dans le dossier</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="EmptyTitle" xml:space="preserve">
+    <value>Recadrer un PDF</value>
+  </data>
+  <data name="EmptyText" xml:space="preserve">
+    <value>Ouvrez un fichier ou glissez-le dans cette fenêtre. Depuis l&apos;Explorateur : clic droit sur un PDF, puis « Recadrer le PDF ».</value>
+  </data>
+  <data name="OpenPdfButton" xml:space="preserve">
+    <value>Ouvrir un PDF…</value>
+  </data>
+  <data name="ClearSelection" xml:space="preserve">
+    <value>Effacer la sélection</value>
+  </data>
+  <data name="ClearSelectionTooltip" xml:space="preserve">
+    <value>Effacer la sélection (Échap)</value>
+  </data>
+  <data name="OpenDialogTitle" xml:space="preserve">
+    <value>Ouvrir un PDF</value>
+  </data>
+  <data name="OpenDialogFilter" xml:space="preserve">
+    <value>Documents PDF (*.pdf)|*.pdf</value>
+  </data>
+  <data name="PageLabel" xml:space="preserve">
+    <value>Page {0} / {1}</value>
+  </data>
+  <data name="PageCountOne" xml:space="preserve">
+    <value>1 page</value>
+  </data>
+  <data name="PageCountMany" xml:space="preserve">
+    <value>{0} pages</value>
+  </data>
+  <data name="StatusHint" xml:space="preserve">
+    <value>Tracez un rectangle sur la page à recadrer.</value>
+  </data>
+  <data name="StatusSelection" xml:space="preserve">
+    <value>Page {0} : zone de {1} × {2} mm</value>
+  </data>
+  <data name="StatusSelectionOnlyPage" xml:space="preserve">
+    <value> (seule cette page sera conservée)</value>
+  </data>
+  <data name="WarningDrawFirst" xml:space="preserve">
+    <value>Tracez d&apos;abord un rectangle sur la page à recadrer.</value>
+  </data>
+  <data name="SuccessOverwrite" xml:space="preserve">
+    <value>« {0} » a été recadré (page {1}).</value>
+  </data>
+  <data name="SuccessCopy" xml:space="preserve">
+    <value>Copie enregistrée : « {0} »</value>
+  </data>
+  <data name="SuccessCopyOnePage" xml:space="preserve">
+    <value>Copie enregistrée : « {0} » (page {1} seule)</value>
+  </data>
+  <data name="ConfirmOverwriteOne" xml:space="preserve">
+    <value>« {0} » ne contiendra plus que la page {1}, recadrée.
+L&apos;autre page sera supprimée définitivement.
+
+Écraser le fichier d&apos;origine ?</value>
+  </data>
+  <data name="ConfirmOverwriteMany" xml:space="preserve">
+    <value>« {0} » ne contiendra plus que la page {1}, recadrée.
+Les {2} autres pages seront supprimées définitivement.
+
+Écraser le fichier d&apos;origine ?</value>
+  </data>
+  <data name="ErrorOpen" xml:space="preserve">
+    <value>Impossible d&apos;ouvrir « {0} » : {1}</value>
+  </data>
+  <data name="ErrorSave" xml:space="preserve">
+    <value>L&apos;enregistrement a échoué : {0}</value>
+  </data>
+  <data name="ErrorFileNotFound" xml:space="preserve">
+    <value>le fichier est introuvable.</value>
+  </data>
+  <data name="ErrorAccessDenied" xml:space="preserve">
+    <value>accès refusé (fichier en lecture seule ou dossier protégé).</value>
+  </data>
+  <data name="ErrorFileInUse" xml:space="preserve">
+    <value>le fichier est ouvert dans une autre application. Fermez-la puis réessayez.</value>
+  </data>
+  <data name="ErrorPassword" xml:space="preserve">
+    <value>le PDF est protégé par un mot de passe.</value>
+  </data>
+  <data name="ErrorAreaTooSmall" xml:space="preserve">
+    <value>la zone sélectionnée est trop petite.</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="SettingsTooltip" xml:space="preserve">
+    <value>Paramètres (Ctrl+,)</value>
+  </data>
+  <data name="SettingsLanguage" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="SettingsLanguageDescription" xml:space="preserve">
+    <value>Langue de l&apos;application. Le menu clic droit suit la langue d&apos;affichage de Windows.</value>
+  </data>
+  <data name="LanguageSystem" xml:space="preserve">
+    <value>Langue du système (automatique)</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>À propos</value>
+  </data>
+  <data name="AboutVersion" xml:space="preserve">
+    <value>Version {0} · licence MIT</value>
+  </data>
+  <data name="AboutDevelopedBy" xml:space="preserve">
+    <value>Développé par </value>
+  </data>
+  <data name="PrintTooltip" xml:space="preserve">
+    <value>Imprimer la zone sélectionnée, sans enregistrer (Ctrl+P)</value>
+  </data>
+  <data name="PrintFit" xml:space="preserve">
+    <value>Imprimer – ajuster au papier</value>
+  </data>
+  <data name="PrintFitTooltip" xml:space="preserve">
+    <value>Remplit la feuille ou l&apos;étiquette, pivotée d&apos;un quart de tour si elle rentre mieux</value>
+  </data>
+  <data name="PrintActualSize" xml:space="preserve">
+    <value>Imprimer – taille réelle</value>
+  </data>
+  <data name="PrintActualSizeTooltip" xml:space="preserve">
+    <value>Imprime à 100 %, centrée (réduite seulement si elle dépasse du papier)</value>
+  </data>
+  <data name="PrintJobName" xml:space="preserve">
+    <value>{0} – page {1}</value>
+  </data>
+  <data name="SuccessPrint" xml:space="preserve">
+    <value>Envoyé à l&apos;imprimante « {0} ».</value>
+  </data>
+  <data name="ErrorPrint" xml:space="preserve">
+    <value>L&apos;impression a échoué : {0}</value>
+  </data>
+</root>

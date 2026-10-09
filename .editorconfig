@@ -1,0 +1,15 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+charset = utf-8
+
+[*.{xml,xaml,csproj,props,targets,slnx,json,yml,yaml}]
+indent_size = 2
+
+# Windows PowerShell 5.1 reads BOM-less files as ANSI: keep the BOM so accents survive.
+[*.ps1]
+charset = utf-8-bom
+end_of_line = crlf

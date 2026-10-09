@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, test and package
+    # windows-latest ships Visual Studio Build Tools (MSVC, CMake, Ninja) and the Windows SDK (makeappx).
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+
+      - name: Check that the tag matches the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: powershell
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version
+          if ("v$version" -ne "${{ github.ref_name }}") {
+            throw "Tag ${{ github.ref_name }} does not match version $version in Directory.Build.props."
+          }
+
+      - name: Build
+        shell: powershell
+        run: .\scripts\build.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CropPdf-Setup
+          path: dist/CropPdf-Setup-*.exe
+          if-no-files-found: error
+
+  release:
+    name: Publish the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: CropPdf-Setup
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: CropPdf-Setup-*.exe
+          generate_release_notes: true

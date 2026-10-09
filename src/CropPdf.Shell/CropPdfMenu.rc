@@ -1,0 +1,25 @@
+// Context menu label, in each supported language. Windows picks the table matching the user's display
+// language (or its parent, e.g. fr-CA -> fr), then falls back to the user/system UI language and finally
+// to US English. Do not mark a table LANG_NEUTRAL: the loader would pick it first, whatever the language.
+#include <windows.h>
+#include "resource.h"
+
+// Any English variant (en-GB, en-CA...).
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+STRINGTABLE
+BEGIN
+    IDS_MENU_TITLE "Crop PDF"
+END
+
+// US English is the loader's last-resort fallback for languages without a table here.
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+STRINGTABLE
+BEGIN
+    IDS_MENU_TITLE "Crop PDF"
+END
+
+LANGUAGE LANG_FRENCH, SUBLANG_NEUTRAL
+STRINGTABLE
+BEGIN
+    IDS_MENU_TITLE "Recadrer le PDF"
+END

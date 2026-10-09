@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English: default UI language. Every key must also exist in Strings.fr.resx (checked by the tests). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Crop PDF</value>
+  </data>
+  <data name="WindowTitleWithFile" xml:space="preserve">
+    <value>{0} – Crop PDF</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="OpenTooltip" xml:space="preserve">
+    <value>Open a PDF (Ctrl+O)</value>
+  </data>
+  <data name="ZoomOutTooltip" xml:space="preserve">
+    <value>Zoom out (Ctrl + mouse wheel)</value>
+  </data>
+  <data name="ZoomInTooltip" xml:space="preserve">
+    <value>Zoom in (Ctrl + mouse wheel)</value>
+  </data>
+  <data name="FitTooltip" xml:space="preserve">
+    <value>Fit to window (Ctrl+0)</value>
+  </data>
+  <data name="Overwrite" xml:space="preserve">
+    <value>Overwrite original</value>
+  </data>
+  <data name="OverwriteTooltip" xml:space="preserve">
+    <value>Replace the original file with the cropped version</value>
+  </data>
+  <data name="SaveCopy" xml:space="preserve">
+    <value>Save a copy</value>
+  </data>
+  <data name="SaveCopyTooltip" xml:space="preserve">
+    <value>Save “name_crop.pdf” next to the original file (Ctrl+S)</value>
+  </data>
+  <data name="OpenResult" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ShowInFolder" xml:space="preserve">
+    <value>Show in folder</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="EmptyTitle" xml:space="preserve">
+    <value>Crop a PDF</value>
+  </data>
+  <data name="EmptyText" xml:space="preserve">
+    <value>Open a file or drop it into this window. From File Explorer: right-click a PDF, then “Crop PDF”.</value>
+  </data>
+  <data name="OpenPdfButton" xml:space="preserve">
+    <value>Open a PDF…</value>
+  </data>
+  <data name="ClearSelection" xml:space="preserve">
+    <value>Clear selection</value>
+  </data>
+  <data name="ClearSelectionTooltip" xml:space="preserve">
+    <value>Clear the selection (Esc)</value>
+  </data>
+  <data name="OpenDialogTitle" xml:space="preserve">
+    <value>Open a PDF</value>
+  </data>
+  <data name="OpenDialogFilter" xml:space="preserve">
+    <value>PDF documents (*.pdf)|*.pdf</value>
+  </data>
+  <data name="PageLabel" xml:space="preserve">
+    <value>Page {0} / {1}</value>
+  </data>
+  <data name="PageCountOne" xml:space="preserve">
+    <value>1 page</value>
+  </data>
+  <data name="PageCountMany" xml:space="preserve">
+    <value>{0} pages</value>
+  </data>
+  <data name="StatusHint" xml:space="preserve">
+    <value>Draw a rectangle on the page to crop.</value>
+  </data>
+  <data name="StatusSelection" xml:space="preserve">
+    <value>Page {0}: {1} × {2} mm area</value>
+  </data>
+  <data name="StatusSelectionOnlyPage" xml:space="preserve">
+    <value> (only this page will be kept)</value>
+  </data>
+  <data name="WarningDrawFirst" xml:space="preserve">
+    <value>First draw a rectangle on the page to crop.</value>
+  </data>
+  <data name="SuccessOverwrite" xml:space="preserve">
+    <value>“{0}” has been cropped (page {1}).</value>
+  </data>
+  <data name="SuccessCopy" xml:space="preserve">
+    <value>Copy saved: “{0}”</value>
+  </data>
+  <data name="SuccessCopyOnePage" xml:space="preserve">
+    <value>Copy saved: “{0}” (page {1} only)</value>
+  </data>
+  <data name="ConfirmOverwriteOne" xml:space="preserve">
+    <value>“{0}” will only contain page {1}, cropped.
+The other page will be permanently deleted.
+
+Overwrite the original file?</value>
+  </data>
+  <data name="ConfirmOverwriteMany" xml:space="preserve">
+    <value>“{0}” will only contain page {1}, cropped.
+The {2} other pages will be permanently deleted.
+
+Overwrite the original file?</value>
+  </data>
+  <data name="ErrorOpen" xml:space="preserve">
+    <value>Cannot open “{0}”: {1}</value>
+  </data>
+  <data name="ErrorSave" xml:space="preserve">
+    <value>Saving failed: {0}</value>
+  </data>
+  <data name="ErrorFileNotFound" xml:space="preserve">
+    <value>the file cannot be found.</value>
+  </data>
+  <data name="ErrorAccessDenied" xml:space="preserve">
+    <value>access denied (read-only file or protected folder).</value>
+  </data>
+  <data name="ErrorFileInUse" xml:space="preserve">
+    <value>the file is open in another application. Close it and try again.</value>
+  </data>
+  <data name="ErrorPassword" xml:space="preserve">
+    <value>the PDF is password-protected.</value>
+  </data>
+  <data name="ErrorAreaTooSmall" xml:space="preserve">
+    <value>the selected area is too small.</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsTooltip" xml:space="preserve">
+    <value>Settings (Ctrl+,)</value>
+  </data>
+  <data name="SettingsLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingsLanguageDescription" xml:space="preserve">
+    <value>Language of the app. The right-click menu follows the Windows display language.</value>
+  </data>
+  <data name="LanguageSystem" xml:space="preserve">
+    <value>System language (automatic)</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AboutVersion" xml:space="preserve">
+    <value>Version {0} · MIT license</value>
+  </data>
+  <data name="AboutDevelopedBy" xml:space="preserve">
+    <value>Developed by </value>
+  </data>
+  <data name="PrintTooltip" xml:space="preserve">
+    <value>Print the selected area, without saving (Ctrl+P)</value>
+  </data>
+  <data name="PrintFit" xml:space="preserve">
+    <value>Print – fit to paper</value>
+  </data>
+  <data name="PrintFitTooltip" xml:space="preserve">
+    <value>Fills the sheet or label, turned a quarter if it fits better</value>
+  </data>
+  <data name="PrintActualSize" xml:space="preserve">
+    <value>Print – actual size</value>
+  </data>
+  <data name="PrintActualSizeTooltip" xml:space="preserve">
+    <value>Prints at 100 %, centered (reduced only if larger than the paper)</value>
+  </data>
+  <data name="PrintJobName" xml:space="preserve">
+    <value>{0} – page {1}</value>
+  </data>
+  <data name="SuccessPrint" xml:space="preserve">
+    <value>Sent to the printer “{0}”.</value>
+  </data>
+  <data name="ErrorPrint" xml:space="preserve">
+    <value>Printing failed: {0}</value>
+  </data>
+</root>
