@@ -21,6 +21,16 @@ with Microsoft Print to PDF on A4: *fit to paper* turned a landscape area a quar
 centered; *actual size* printed it at 100 %, centered. Layout unit-tested; area rendering checked on a rotated page.
 Checked on screen by the author: the “Recadrer le PDF” entry with its icon in the new Windows 11 context menu,
 and the app icon in the taskbar when started from it.
+The repository is public and CI passes on push (tests, full build, installer uploaded as the `CropPdf-Setup`
+artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
+`CropPdf-Setup-1.0.0.exe` in the GitHub Release (release notes: only the auto-generated changelog link).
+
+**Updates (not released yet, after 1.0.0)**: startup check of the GitHub Releases, “new version” bar in the main
+window, *Updates* card in Settings (status, check/update button, startup-check toggle, Stable/Beta channel),
+download + SHA-256 check + silent install that closes and restarts the app; beta tags published as pre-releases.
+61 unit tests pass (versions, channels, feed parsing, checksum, download). Checked on screen through UI Automation
+with a build versioned 0.9.0 (bar and card show “1.0.0 available”) and with 1.0.0 (“up to date”), light/dark,
+English/French. The beta installer compiles (`1.1.0-beta.1` → file version `1.1.0`).
 
 Not verified yet:
 - printing on a physical printer, especially shipping labels on a label printer (the main use case);
@@ -28,12 +38,13 @@ Not verified yet:
   language, and the installer language auto-selection was only seen in French;
 - Windows 10 (classic menu only);
 - UAC answered with a *different* administrator account: the package is then registered for that account only;
-- the GitHub Actions workflow (never run).
+- installing from the Release download (SmartScreen “Mark of the Web” path) on a clean PC;
+- the update installation itself (download, UAC, Restart Manager closing the app, relaunch as the user) and the
+  pre-release workflow: only a real release can exercise them.
 
 Next steps:
-1. Check that CI passes on the first push, then release `v1.0.0` (see “Releasing a version” in the README).
-2. Add the update check (see “To do”) against the repository above; the About card and the installer's
-   `AppPublisherURL` (both pointing at the GitHub profile today) could then link to the repository too.
+1. Release the update system as a beta (e.g. `v1.1.0-beta.1`) and test the whole update path with it: an older
+   build on the Beta channel must download, install and restart into the beta.
 
 ## Commands
 
@@ -68,8 +79,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 | Folder | Role |
 |--------|------|
-| `src/CropPdf.Core` | Pure, tested logic: `CropGeometry` (screen → PDF coordinates), `PdfCropper` (writing with PDFsharp), `OutputPath` (`_crop` name), `PrintLayout` (size/rotation on the sheet), `CropAreaTooSmallException`. No UI text. |
-| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language setting), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
+| `src/CropPdf.Core` | Pure, tested logic: `CropGeometry` (screen → PDF coordinates), `PdfCropper` (writing with PDFsharp), `OutputPath` (`_crop` name), `PrintLayout` (size/rotation on the sheet), `CropAreaTooSmallException`, `SemanticVersion` (SemVer parsing/ordering), `UpdateFeed` (GitHub Releases: parsing, channel choice, download, SHA-256 check). No UI text. |
+| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, updates), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
 | `src/CropPdf.Shell` | C++ DLL (WRL) implementing `IExplorerCommand`: has File Explorer start `CropPdf.exe "<file>"`, located next to it. Localized label in `CropPdfMenu.rc`. |
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
 | `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |
@@ -104,6 +115,21 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   `PrintLayout`: *fit to paper* (turned a quarter when that gives a bigger print) or *actual size* (reduced only
   when too large, never turned). The mode used last is saved (`AppSettings.PrintScaling`) and reused by `Ctrl+P`.
   The print button is deliberately discreet (icon only, like Settings), as asked by the author.
+- **Updates** (`Updater`, `UpdateFeed`): the source is the GitHub Releases of `quentinperou/CropPdf`
+  (`/releases?per_page=30`, unauthenticated: 60 requests/hour per IP, a failure at startup is silent). A release
+  counts if it is not a draft, its tag parses as SemVer and it has a `CropPdf-Setup-*.exe` asset. *Stable* =
+  non-pre-releases only; *Beta* = everything; the newest version above the running one is offered (never a
+  downgrade: back on Stable, a beta is kept until a newer stable). The running version is the assembly's
+  `InformationalVersion` without `+commit`. Checked at every startup (toggle in Settings, default on) and on
+  demand; offered, never forced (installing needs UAC). Install: download to `%TEMP%\CropPdf-Update` (deleted at
+  the next startup), SHA-256 compared with the asset `digest` published by GitHub while the file is kept open
+  read-only (the checked file is the one that runs), then `/SP- /SILENT /NORESTART /CLOSEAPPLICATIONS
+  /FORCECLOSEAPPLICATIONS /RELAUNCH=1`. The installer starts unelevated and asks for UAC itself, so the app does
+  not exit on its own: it waits for the installer, which closes it through the Restart Manager; a non-zero exit
+  code means “not installed” (UAC declined, error). `/RELAUNCH=1` makes the `[Run]` entry start the new version
+  `runasoriginaluser` (not elevated).
+- **Beta releases**: `<Version>1.3.0-beta.1</Version>` + tag `v1.3.0-beta.1`; the workflow marks tags containing
+  `-` as pre-releases. The installer's `VersionInfoVersion` uses the numeric part only (ISPP `Pos`/`Copy`).
 
 ### Localization
 
@@ -161,7 +187,14 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   (`restartreplace`).
 - PDFsharp: the `PdfRectangle(double, double, double, double)` constructor is internal; use two `XPoint`s.
 - Fluent-based styles have a disabled state with a solid background: subtle buttons are hidden rather than disabled.
+- WPF's Fluent theme has the `ToggleSwitch*` brushes but no toggle switch style: `SettingsWindow` defines one
+  (`ToggleSwitch`, a `CheckBox` template). Theme resource keys can be listed with a file-based app
+  (`dotnet run keys.cs` with `#:property UseWPF=true`, `PublishAot=false`, `NoWarn=WPF0001`).
+- The Inno Setup installer is `asInvoker` and elevates by restarting itself: starting it never throws for a
+  declined UAC prompt; only its exit code tells (0 = installed).
 - The first launch after an install is slower (cold .NET start): wait a few seconds before checking the window.
+- After moving or renaming the project folder, CMake refuses the old cache in `build\shell` ("CMakeCache.txt
+  directory is different"): delete `build\shell` and build again.
 - On Windows 11, WPF's `PrintDialog` appears as the **modern print dialog**, hosted by `explorer.exe` (window
   “Crop PDF – Imprimer”, class `ApplicationFrameWindow`), and shows “This app doesn't support print preview”
   (classic printing API, see “To do”).
@@ -187,18 +220,19 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 ## Tests
 
 - `tests/CropPdf.Tests` (xUnit) covers `CropPdf.Core`: geometry (rotations, offset CropBox, bounds) and produced
-  files (single page, boxes, rotation kept, overwrite, `_crop` name), plus `LocalizationTests`.
+  files (single page, boxes, rotation kept, overwrite, `_crop` name), print layout, updates (`SemanticVersion`
+  ordering, `UpdateFeed` parsing of a GitHub-shaped JSON, Stable/Beta choice, checksum, download through a fake
+  `HttpMessageHandler`), plus `LocalizationTests`.
 - The UI is checked by hand: open the PDF from `tools\SamplePdf` (rotated page, page with an existing CropBox),
   draw, save, reopen the result.
 - The UI can also be driven with UI Automation (`System.Windows.Automation`) without moving the mouse: icon
   buttons have accessible names, and the Settings window is a child of the main window in the UIA tree.
+  `PrintWindow(hwnd, hdc, PW_RENDERFULLCONTENT)` from a DPI-aware process captures a window for review.
+- Update offer on screen: build a copy with an older version (`dotnet build src\CropPdf -p:Version=0.9.0 -o <dir>`)
+  and start it: it finds the latest Release. Do not click *Update* there unless installing is intended.
 
 ## To do (see also the README)
 
-- **Updates through GitHub Releases** once the repository is public: query
-  `https://api.github.com/repos/<owner>/<repo>/releases/latest` at most once a day, compare with the assembly
-  version, show an InfoBar “Version x available” with a button that downloads the `CropPdf-Setup-*.exe` asset
-  and runs it (`/SILENT`). **Offer** the update rather than forcing it: installing needs UAC anyway.
 - **Print preview** in the Windows 11 print dialog (idea kept by the author for later): requires the modern print
   API instead of WPF's `PrintDialog`: `PrintManager` (through `IPrintManagerInterop` for a window handle) with an
   `IPrintDocumentSource` that provides preview pages (`IPrintPreviewPageCollection`) and the final document,

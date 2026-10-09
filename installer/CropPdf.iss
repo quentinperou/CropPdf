@@ -1,9 +1,17 @@
 ﻿; Crop PDF installer (Inno Setup 6), in English and French (picked from the Windows display language).
 ; Built by scripts\build.ps1, which prepares dist\ first:
 ;   ISCC.exe /DAppVersion=1.0.0 installer\CropPdf.iss
+; The app also runs it to install an update (src\CropPdf\Updater.cs): silent, closing the running app, /RELAUNCH=1.
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
+#endif
+
+; Windows file versions are numbers only: 1.1.0 for a 1.1.0-beta.1 pre-release.
+#if Pos("-", AppVersion) > 0
+  #define AppFileVersion Copy(AppVersion, 1, Pos("-", AppVersion) - 1)
+#else
+  #define AppFileVersion AppVersion
 #endif
 
 #define AppName "Crop PDF"
@@ -17,7 +25,9 @@ AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
 AppPublisher=QuentinPerou
 AppPublisherURL=https://github.com/quentinperou
-VersionInfoVersion={#AppVersion}
+AppSupportURL=https://github.com/quentinperou/CropPdf
+AppUpdatesURL=https://github.com/quentinperou/CropPdf/releases
+VersionInfoVersion={#AppFileVersion}
 DefaultDirName={autopf}\Crop PDF
 DisableProgramGroupPage=yes
 ; Admin rights: needed to register the unsigned context-menu package (Add-AppxPackage -AllowUnsigned).
@@ -74,7 +84,17 @@ Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"
 Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#AppExe}"",0"
 Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExe}"" ""%1"""
 
+[Run]
+; Update installed from the app (silent, /RELAUNCH=1): start the app again, as the user, not elevated.
+Filename: "{app}\{#AppExe}"; Flags: nowait runasoriginaluser skipifnotsilent; Check: RelaunchRequested
+
 [Code]
+{ Set by the app when it installs an update (Updater.InstallerArguments). }
+function RelaunchRequested: Boolean;
+begin
+  Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
+end;
+
 function IsWindows11: Boolean;
 var
   Version: TWindowsVersion;

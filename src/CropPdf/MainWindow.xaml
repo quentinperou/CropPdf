@@ -113,22 +113,46 @@
       </StackPanel>
     </DockPanel>
 
-    <!-- Info bar (success / warning / error), styled like the WinUI InfoBar. -->
-    <Border x:Name="InfoBar" Grid.Row="1" Margin="12,0,12,8" Padding="14,6,6,6" CornerRadius="4"
-            BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" Visibility="Collapsed">
-      <DockPanel>
-        <TextBlock x:Name="InfoIcon" DockPanel.Dock="Left" Style="{StaticResource Glyph}" Margin="0,0,12,0" />
-        <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Padding="8" Click="CloseInfo_Click" ToolTip="{local:Tr Close}"
-                AutomationProperties.Name="{local:Tr Close}">
-          <TextBlock Style="{StaticResource Glyph}" FontSize="12" Text="&#xE711;" />
-        </Button>
-        <StackPanel x:Name="InfoActions" DockPanel.Dock="Right" Orientation="Horizontal" Margin="12,0,4,0">
-          <Button Content="{local:Tr OpenResult}" Margin="0,0,6,0" Click="OpenResult_Click" />
-          <Button Content="{local:Tr ShowInFolder}" Click="ShowInFolder_Click" />
-        </StackPanel>
-        <TextBlock x:Name="InfoText" VerticalAlignment="Center" TextWrapping="Wrap" />
-      </DockPanel>
-    </Border>
+    <StackPanel Grid.Row="1">
+      <!-- New version available (informational InfoBar), kept apart from the results of the user's actions. -->
+      <Border x:Name="UpdateBar" Margin="12,0,12,8" Padding="14,6,6,6" CornerRadius="4" BorderThickness="1"
+              BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+              Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}" Visibility="Collapsed">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Left" Style="{StaticResource Glyph}" Margin="0,0,12,0" Text="&#xE896;"
+                     Foreground="{DynamicResource SystemFillColorAttentionBrush}" />
+          <!-- Hidden rather than disabled while installing: a disabled subtle button gets a solid background. -->
+          <Button x:Name="UpdateCloseButton" DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Padding="8"
+                  Click="CloseUpdate_Click" ToolTip="{local:Tr Close}" AutomationProperties.Name="{local:Tr Close}">
+            <TextBlock Style="{StaticResource Glyph}" FontSize="12" Text="&#xE711;" />
+          </Button>
+          <StackPanel x:Name="UpdateActions" DockPanel.Dock="Right" Orientation="Horizontal" Margin="12,0,4,0">
+            <Button Content="{local:Tr UpdateWhatsNew}" Margin="0,0,6,0" Click="UpdateNotes_Click" />
+            <Button Content="{local:Tr UpdateInstall}" Style="{DynamicResource AccentButtonStyle}" Click="UpdateInstall_Click" />
+          </StackPanel>
+          <ProgressBar x:Name="UpdateProgress" DockPanel.Dock="Right" Width="180" Margin="12,0,10,0" Maximum="1"
+                       VerticalAlignment="Center" Visibility="Collapsed" />
+          <TextBlock x:Name="UpdateText" VerticalAlignment="Center" TextWrapping="Wrap" />
+        </DockPanel>
+      </Border>
+
+      <!-- Info bar (success / warning / error), styled like the WinUI InfoBar. -->
+      <Border x:Name="InfoBar" Margin="12,0,12,8" Padding="14,6,6,6" CornerRadius="4"
+              BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" Visibility="Collapsed">
+        <DockPanel>
+          <TextBlock x:Name="InfoIcon" DockPanel.Dock="Left" Style="{StaticResource Glyph}" Margin="0,0,12,0" />
+          <Button DockPanel.Dock="Right" Style="{StaticResource SubtleButton}" Padding="8" Click="CloseInfo_Click" ToolTip="{local:Tr Close}"
+                  AutomationProperties.Name="{local:Tr Close}">
+            <TextBlock Style="{StaticResource Glyph}" FontSize="12" Text="&#xE711;" />
+          </Button>
+          <StackPanel x:Name="InfoActions" DockPanel.Dock="Right" Orientation="Horizontal" Margin="12,0,4,0">
+            <Button Content="{local:Tr OpenResult}" Margin="0,0,6,0" Click="OpenResult_Click" />
+            <Button Content="{local:Tr ShowInFolder}" Click="ShowInFolder_Click" />
+          </StackPanel>
+          <TextBlock x:Name="InfoText" VerticalAlignment="Center" TextWrapping="Wrap" />
+        </DockPanel>
+      </Border>
+    </StackPanel>
 
     <!-- Pages -->
     <Border Grid.Row="2" Background="{DynamicResource LayerFillColorDefaultBrush}"

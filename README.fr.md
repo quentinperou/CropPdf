@@ -30,6 +30,9 @@
 - Interface Windows 11 (Fluent, Mica) qui **suit le thème clair/sombre** et la couleur d'accentuation de Windows.
 - **Français et anglais** : l'appli, le menu clic droit et l'installeur suivent la langue d'affichage de Windows ;
   la langue de l'appli peut aussi être choisie dans les **Paramètres** (icône d'engrenage).
+- **Mises à jour en un clic** : au démarrage, l'appli consulte les Releases GitHub et propose la nouvelle version,
+  qui s'installe et relance l'appli. Dans les **Paramètres** : rechercher maintenant, désactiver la recherche au
+  démarrage, ou choisir le canal **Bêta** pour recevoir les nouveautés en avance.
 
 ### Raccourcis
 
@@ -58,6 +61,11 @@ L'installeur :
 - copie l'application dans `C:\Program Files\Crop PDF` et l'ajoute au menu Démarrer ;
 - ajoute l'entrée « Recadrer le PDF » au menu clic droit des fichiers `.pdf` ;
 - propose d'installer le **.NET 10 Desktop Runtime** (Microsoft) s'il est absent.
+
+Pour mettre à jour : l'appli propose elle-même les nouvelles versions (bandeau en haut de la fenêtre, ou
+**Paramètres → Mises à jour**) ; l'installation redemande l'autorisation administrateur. La vérification envoie
+une seule requête à GitHub (`api.github.com`) au démarrage, sans donnée personnelle, et peut être désactivée
+dans les Paramètres.
 
 Pour l'enlever : **Paramètres → Applications → Applications installées → Crop PDF**.
 
@@ -123,8 +131,8 @@ dotnet run --project tools\InvokeMenu -- C:\temp\exemple.pdf   # lance la comman
 
 ```
 src/
-  CropPdf.Core/     Logique de recadrage, sans interface (PDFsharp) : conversion des coordonnées, écriture du PDF
-  CropPdf/          Application WPF : affichage des pages (Windows.Data.Pdf), sélection, enregistrement, paramètres, textes
+  CropPdf.Core/     Logique sans interface : conversion des coordonnées, écriture du PDF (PDFsharp), mises à jour (Releases GitHub)
+  CropPdf/          Application WPF : affichage des pages (Windows.Data.Pdf), sélection, enregistrement, impression, paramètres, mises à jour, textes
   CropPdf.Shell/    DLL C++ du menu contextuel Windows 11 (IExplorerCommand), avec son libellé traduit
 package/            Manifeste et logos du package « sparse » (identité de l'appli pour le menu Windows 11)
 installer/          Script Inno Setup de l'installeur
@@ -161,9 +169,14 @@ administrateur, d'où la demande UAC à l'installation.
 2. Committez, puis créez et poussez un tag : `git tag v1.2.0` puis `git push origin v1.2.0`.
 3. Le workflow GitHub Actions compile, teste et publie l'installeur dans une Release.
 
+L'appli propose la nouvelle Release à ses utilisateurs à leur prochain démarrage.
+
+**Version bêta :** mêmes étapes avec un numéro de pré-version, par exemple `<Version>1.3.0-beta.1</Version>` et
+le tag `v1.3.0-beta.1`. Le workflow la publie comme *pre-release* : seuls les utilisateurs du canal **Bêta** se la
+voient proposer. La version finale `1.3.0` est ensuite proposée à tous (elle est plus récente que toute `1.3.0-beta.x`).
+
 ## Feuille de route
 
-- [ ] **Mises à jour** : au démarrage (au plus une fois par jour), interroger les Releases GitHub ; si une version plus récente existe, l'annoncer dans l'appli avec un bouton « Mettre à jour » qui télécharge et lance le nouvel installeur.
 - [ ] **Signature gratuite** de l'installeur et du package via [SignPath Foundation](https://signpath.org) (réservé aux projets open source ayant déjà une release) : plus d'avertissement SmartScreen, et plus besoin de droits administrateur pour le menu.
 - [ ] Éventuellement, publication sur le **Microsoft Store** (gratuit pour les particuliers, le Store signe l'application) ; le [Windows App Certification Kit](https://learn.microsoft.com/fr-fr/windows/uwp/debug-test-perf/windows-app-certification-kit) permet de vérifier l'appli avant soumission ([action GitHub](https://github.com/marketplace/actions/run-the-windows-app-certification-kit)).
 - [ ] **Aperçu avant impression** dans la fenêtre d'impression de Windows 11. Elle affiche pour l'instant « Cette application ne prend pas en charge l'aperçu avant impression » : WPF imprime avec l'ancienne interface d'impression de Windows, qui ne peut pas fournir de pages d'aperçu. Il faut passer par l'interface moderne (`PrintManager` + `IPrintDocumentSource`, pages d'aperçu dessinées avec Direct2D).

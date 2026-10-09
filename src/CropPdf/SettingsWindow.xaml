@@ -19,6 +19,16 @@
       <Setter Property="Margin" Value="0,0,0,4" />
     </Style>
 
+    <!-- Rows under the first one of a card, aligned with its title (16 padding + 20 icon + 16 margin). -->
+    <Style x:Key="CardSubRow" TargetType="DockPanel">
+      <Setter Property="Margin" Value="52,12,16,12" />
+    </Style>
+
+    <Style x:Key="CardDivider" TargetType="Rectangle">
+      <Setter Property="Height" Value="1" />
+      <Setter Property="Fill" Value="{DynamicResource DividerStrokeColorDefaultBrush}" />
+    </Style>
+
     <Style x:Key="CardIcon" TargetType="TextBlock">
       <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
       <Setter Property="FontSize" Value="20" />
@@ -31,6 +41,44 @@
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Margin" Value="0,2,0,0" />
       <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+    </Style>
+
+    <!-- Windows 11 toggle switch: the Fluent theme has its brushes but no style for it. -->
+    <Style x:Key="ToggleSwitch" TargetType="CheckBox">
+      <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <Border x:Name="Track" Width="40" Height="20" CornerRadius="10" BorderThickness="1"
+                    Background="{DynamicResource ToggleSwitchFillOff}" BorderBrush="{DynamicResource ToggleSwitchStrokeOff}">
+              <Ellipse x:Name="Knob" Width="12" Height="12" Margin="3,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Fill="{DynamicResource ToggleSwitchKnobFillOff}" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Track" Property="Background" Value="{DynamicResource ToggleSwitchFillOffPointerOver}" />
+                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource ToggleSwitchKnobFillOffPointerOver}" />
+                <Setter TargetName="Knob" Property="Width" Value="14" />
+                <Setter TargetName="Knob" Property="Height" Value="14" />
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Track" Property="Background" Value="{DynamicResource ToggleSwitchFillOn}" />
+                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource ToggleSwitchStrokeOn}" />
+                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource ToggleSwitchKnobFillOn}" />
+                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+              </Trigger>
+              <MultiTrigger>
+                <MultiTrigger.Conditions>
+                  <Condition Property="IsChecked" Value="True" />
+                  <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Track" Property="Background" Value="{DynamicResource ToggleSwitchFillOnPointerOver}" />
+                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource ToggleSwitchKnobFillOnPointerOver}" />
+              </MultiTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
   </Window.Resources>
 
@@ -47,6 +95,47 @@
           <TextBlock Style="{StaticResource CardDescription}" Text="{local:Tr SettingsLanguageDescription}" />
         </StackPanel>
       </DockPanel>
+    </Border>
+
+    <!-- Updates: status and check/install button, then the startup check and the channel. -->
+    <Border Style="{StaticResource Card}" Padding="0">
+      <StackPanel>
+        <DockPanel Margin="16,14">
+          <TextBlock DockPanel.Dock="Left" Style="{StaticResource CardIcon}" Text="&#xE895;" />
+          <Button x:Name="UpdateButton" DockPanel.Dock="Right" MinWidth="220" VerticalAlignment="Center"
+                  Margin="16,0,0,0" Click="UpdateButton_Click" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{local:Tr UpdatesTitle}" />
+            <TextBlock x:Name="UpdateStatusText" Style="{StaticResource CardDescription}" />
+            <TextBlock x:Name="UpdateNotesLink" Style="{StaticResource CardDescription}" Visibility="Collapsed">
+              <Hyperlink Click="UpdateNotes_Click"><Run Text="{local:Tr UpdateWhatsNew}" /></Hyperlink>
+            </TextBlock>
+            <ProgressBar x:Name="UpdateProgress" Maximum="1" Margin="0,8,0,2" Visibility="Collapsed" />
+          </StackPanel>
+        </DockPanel>
+
+        <Rectangle Style="{StaticResource CardDivider}" />
+        <DockPanel Style="{StaticResource CardSubRow}">
+          <CheckBox x:Name="CheckAtStartupBox" DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                    VerticalAlignment="Center" Margin="16,0,0,0" Click="CheckAtStartup_Click"
+                    AutomationProperties.Name="{local:Tr UpdateCheckAtStartup}" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{local:Tr UpdateCheckAtStartup}" />
+            <TextBlock Style="{StaticResource CardDescription}" Text="{local:Tr UpdateCheckAtStartupDescription}" />
+          </StackPanel>
+        </DockPanel>
+
+        <Rectangle Style="{StaticResource CardDivider}" />
+        <DockPanel Style="{StaticResource CardSubRow}">
+          <ComboBox x:Name="ChannelBox" DockPanel.Dock="Right" MinWidth="220" VerticalAlignment="Center"
+                    Margin="16,0,0,0" SelectionChanged="ChannelBox_SelectionChanged"
+                    AutomationProperties.Name="{local:Tr UpdateChannel}" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{local:Tr UpdateChannel}" />
+            <TextBlock Style="{StaticResource CardDescription}" Text="{local:Tr UpdateChannelDescription}" />
+          </StackPanel>
+        </DockPanel>
+      </StackPanel>
     </Border>
 
     <Border Style="{StaticResource Card}">

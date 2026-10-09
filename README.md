@@ -30,6 +30,9 @@
 - Windows 11 look (Fluent, Mica) that **follows the light/dark theme** and the accent color of Windows.
 - **English and French**: the app, the context menu and the installer follow the Windows display language;
   the app language can also be chosen in **Settings** (gear icon).
+- **Updates in one click**: at startup the app checks the GitHub Releases and offers the new version, which
+  installs itself and restarts the app. In **Settings**: check now, turn off the check at startup, or choose
+  the **Beta** channel to get new versions earlier.
 
 ### Shortcuts
 
@@ -58,6 +61,10 @@ The installer:
 - copies the app to `C:\Program Files\Crop PDF` and adds it to the Start menu;
 - adds the “Crop PDF” entry to the right-click menu of `.pdf` files;
 - offers to install the Microsoft **.NET 10 Desktop Runtime** if it is missing.
+
+To update: the app offers new versions itself (a bar at the top of the window, or **Settings → Updates**);
+installing one asks for the administrator prompt again. The check sends a single request to GitHub
+(`api.github.com`) at startup, with no personal data, and can be turned off in Settings.
 
 To uninstall: **Settings → Apps → Installed apps → Crop PDF**.
 
@@ -123,8 +130,8 @@ dotnet run --project tools\InvokeMenu -- C:\temp\sample.pdf    # run the install
 
 ```
 src/
-  CropPdf.Core/     Cropping logic, no UI (PDFsharp): coordinate conversion, writing the PDF
-  CropPdf/          WPF app: page display (Windows.Data.Pdf), selection, saving, settings, UI strings
+  CropPdf.Core/     Logic without UI: coordinate conversion, writing the PDF (PDFsharp), update feed (GitHub Releases)
+  CropPdf/          WPF app: page display (Windows.Data.Pdf), selection, saving, printing, settings, updates, UI strings
   CropPdf.Shell/    C++ DLL for the Windows 11 context menu (IExplorerCommand), with its localized label
 package/            Manifest and logos of the “sparse” package (the app identity for the Windows 11 menu)
 installer/          Inno Setup script of the installer
@@ -160,9 +167,14 @@ administrator session, hence the UAC prompt during installation.
 2. Commit, then create and push a tag: `git tag v1.2.0`, then `git push origin v1.2.0`.
 3. The GitHub Actions workflow builds, tests and publishes the installer in a Release.
 
+The app offers the new Release to its users at their next startup.
+
+**Beta version:** same steps with a pre-release number, e.g. `<Version>1.3.0-beta.1</Version>` and the tag
+`v1.3.0-beta.1`. The workflow publishes it as a *pre-release*: only users on the **Beta** channel are offered
+it. The final `1.3.0` is then offered to everyone (it is newer than any `1.3.0-beta.x`).
+
 ## Roadmap
 
-- [ ] **Updates**: at startup (at most once a day), query the GitHub Releases; if a newer version exists, show it in the app with an “Update” button that downloads and runs the new installer.
 - [ ] **Free signing** of the installer and package through [SignPath Foundation](https://signpath.org) (for open source projects that already have a release): no more SmartScreen warning, and no administrator rights needed for the menu.
 - [ ] Possibly, publishing on the **Microsoft Store** (free for individuals, the Store signs the app); the [Windows App Certification Kit](https://learn.microsoft.com/windows/uwp/debug-test-perf/windows-app-certification-kit) checks the app before submission ([GitHub action](https://github.com/marketplace/actions/run-the-windows-app-certification-kit)).
 - [ ] **Print preview** in the Windows 11 print dialog. It currently says “This app doesn't support print preview”: WPF prints through the classic printing API, which cannot provide preview pages. It needs the modern print API (`PrintManager` + `IPrintDocumentSource`, preview pages drawn with Direct2D).

@@ -64,6 +64,10 @@ public partial class MainWindow : Window
                 SetZoom(FitZoom(), fitToWindow: true);
         };
 
+        // The startup check usually ends after the window is shown; a rebuilt window shows its result at once.
+        Updater.Checked += Updater_Checked;
+        ShowUpdateBar();
+
         UpdateUi();
     }
 
@@ -145,6 +149,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        Updater.Checked -= Updater_Checked;
         CloseDocument();
         base.OnClosed(e);
     }
@@ -328,6 +333,79 @@ public partial class MainWindow : Window
         _ when ex.HResult == ErrorWrongPassword => Strings.Get("ErrorPassword"),
         _ => ex.Message,
     };
+
+    // ---------------------------------------------------------------- Updates
+
+    // Closing the bar hides that version for the rest of the run, also after a language change.
+    private static SemanticVersion? s_dismissedUpdate;
+
+    private bool _installingUpdate;
+
+    private void Updater_Checked(object? sender, EventArgs e) => ShowUpdateBar();
+
+    private void ShowUpdateBar()
+    {
+        if (_installingUpdate)
+            return;
+        if (Updater.Available is not { } release || release.Version == s_dismissedUpdate)
+        {
+            UpdateBar.Visibility = Visibility.Collapsed;
+            return;
+        }
+        UpdateText.Text = Strings.Format("UpdateAvailableBar", release.Version);
+        UpdateActions.Visibility = Visibility.Visible;
+        UpdateCloseButton.Visibility = Visibility.Visible;
+        UpdateProgress.Visibility = Visibility.Collapsed;
+        UpdateBar.Visibility = Visibility.Visible;
+    }
+
+    private async void UpdateInstall_Click(object sender, RoutedEventArgs e)
+    {
+        if (Updater.Available is not { } release)
+            return;
+
+        UpdateActions.Visibility = Visibility.Collapsed;
+        UpdateCloseButton.Visibility = Visibility.Collapsed;
+        UpdateProgress.Value = 0;
+        UpdateProgress.IsIndeterminate = false;
+        UpdateProgress.Visibility = Visibility.Visible;
+        UpdateText.Text = Strings.Get("UpdateDownloading");
+        var progress = new Progress<double>(p =>
+        {
+            UpdateProgress.Value = p;
+            if (p < 1)
+                return;
+            // Downloaded: the installer now waits for the UAC prompt, then installs.
+            UpdateProgress.IsIndeterminate = true;
+            UpdateText.Text = Strings.Get("UpdateStarting");
+        });
+
+        _installingUpdate = true;
+        try
+        {
+            if (await Updater.InstallAsync(release, progress))
+                return; // the app is closing, the installer takes over
+            ShowInfo(Severity.Warning, Strings.Get("UpdateCancelled"));
+        }
+        catch (Exception ex)
+        {
+            ShowInfo(Severity.Error, Strings.Format("ErrorUpdate", Updater.Describe(ex)));
+        }
+        _installingUpdate = false;
+        ShowUpdateBar();
+    }
+
+    private void UpdateNotes_Click(object sender, RoutedEventArgs e)
+    {
+        if (Updater.Available is { } release)
+            Updater.OpenReleasePage(release);
+    }
+
+    private void CloseUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        s_dismissedUpdate = Updater.Available?.Version;
+        UpdateBar.Visibility = Visibility.Collapsed;
+    }
 
     // ---------------------------------------------------------------- Selection
 

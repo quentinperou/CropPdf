@@ -60,7 +60,9 @@ jobs:
         with:
           name: CropPdf-Setup
 
+      # A tag with a suffix (v1.2.0-beta.1) is published as a pre-release: only the app's Beta channel offers it.
       - uses: softprops/action-gh-release@v2
         with:
           files: CropPdf-Setup-*.exe
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}

@@ -24,6 +24,13 @@ public sealed class AppSettings
     [JsonConverter(typeof(JsonStringEnumConverter<PrintScaling>))]
     public PrintScaling PrintScaling { get; set; } = PrintScaling.FitToPaper;
 
+    /// <summary>Ask GitHub for a newer version when the app starts.</summary>
+    public bool CheckForUpdatesAtStartup { get; set; } = true;
+
+    /// <summary>Releases offered as updates: stable only, or betas too.</summary>
+    [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
+    public UpdateChannel UpdateChannel { get; set; } = UpdateChannel.Stable;
+
     // A missing or damaged file just means default settings: preferences are never worth an error message.
     public static AppSettings Load()
     {

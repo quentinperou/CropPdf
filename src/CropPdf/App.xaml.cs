@@ -42,6 +42,9 @@ public partial class App : Application
         string? file = e.Args.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(file))
             _ = window.OpenAsync(file);
+
+        // Once per run (not when the window is rebuilt for a language change); the window shows the offer.
+        _ = Updater.CheckAtStartupAsync();
     }
 
     /// <summary>Sets the UI language: <see cref="AppSettings.SystemLanguage"/> or a culture name ("en", "fr").</summary>
