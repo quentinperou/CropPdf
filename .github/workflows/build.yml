@@ -16,9 +16,9 @@ jobs:
     # windows-latest ships Visual Studio Build Tools (MSVC, CMake, Ninja) and the Windows SDK (makeappx).
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -42,11 +42,14 @@ jobs:
         shell: powershell
         run: .\scripts\build.ps1
 
-      - uses: actions/upload-artifact@v4
+      # Only a release needs the installer, to hand it to the job below; other builds just check that it builds.
+      - uses: actions/upload-artifact@v7
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           name: CropPdf-Setup
           path: dist/CropPdf-Setup-*.exe
           if-no-files-found: error
+          retention-days: 1
 
   release:
     name: Publish the release
@@ -56,12 +59,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: CropPdf-Setup
 
       # A tag with a suffix (v1.2.0-beta.1) is published as a pre-release: only the app's Beta channel offers it.
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: CropPdf-Setup-*.exe
           generate_release_notes: true

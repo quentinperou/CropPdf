@@ -105,7 +105,7 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
 | `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |
 | `scripts/` | `build.ps1`, `make-icons.ps1` (regenerates the `.ico` and logos; the generated files are committed). |
-| `.github/workflows/build.yml` | CI: build + tests on every push; on a `v*` tag, publishes the installer in a Release. |
+| `.github/workflows/build.yml` | CI: build + tests on every push; on a `v*` tag, publishes the installer in a Release (the installer goes from the Windows job to the release job as an artifact, uploaded for tags only and kept 1 day). Actions on their Node 24 majors (checkout v7, setup-dotnet v6, upload-artifact v7, download-artifact v8, action-gh-release v3). |
 | `docs/` | Icon used by the README. |
 | `tools/` | Dev tools: `SamplePdf` (test PDF), `InvokeMenu` (runs the installed menu command). Not in the solution. |
 
@@ -202,6 +202,9 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 - **CLSID `5C9B0CAD-9A30-49DA-827A-1672AC5D7FB8`**: in `dllmain.cpp` *and* `AppxManifest.xml`. The package name
   `CropPdf.ContextMenu`: in `AppxManifest.xml` *and* `CropPdf.iss`. Keep them in sync.
 - Inno Setup: a line starting with `[` is read as a section header, even indented inside `[Code]`.
+- Inno Setup → PowerShell: never put a path inside the `-Command` text (a `'` or a typographic `’` in the folder
+  name ends PowerShell's quoted string); pass it through an environment variable (`SetEnvironmentVariableW`,
+  inherited by the child) and use `$env:NAME`, as `RegisterContextMenu` does.
 - **Starting the app from the DLL**: a direct `CreateProcess` from the `dllhost` surrogate (which has the package
   identity) gives `CropPdf.exe` the package identity too, because it sits in the external location, whatever the
   `PROC_THREAD_ATTRIBUTE_DESKTOP_APP_POLICY`. The taskbar then shows a blank tile. So the DLL asks File Explorer

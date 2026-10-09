@@ -118,11 +118,17 @@ begin
   RunPowerShell('Get-AppxPackage -Name {#PackageName} | Remove-AppxPackage');
 end;
 
+function SetEnvironmentVariable(Name, Value: String): BOOL;
+  external 'SetEnvironmentVariableW@kernel32.dll stdcall';
+
 procedure RegisterContextMenu;
 begin
-  { A line may not start with '[' in an .iss file, even inside [Code]. }
-  if not RunPowerShell(Format('Add-AppxPackage -Path ''%s'' -ExternalLocation ''%s'' -AllowUnsigned', [
-    ExpandConstant('{app}\CropPdf.Menu.msix'), ExpandConstant('{app}')])) then
+  { The paths reach PowerShell through environment variables (inherited by the child process), not inside the
+    command text: a quote in the install folder (L'appli, or the typographic ’ that PowerShell also treats as a
+    quote) would end a quoted string and break the command. }
+  SetEnvironmentVariable('CROPPDF_MSIX', ExpandConstant('{app}\CropPdf.Menu.msix'));
+  SetEnvironmentVariable('CROPPDF_LOCATION', ExpandConstant('{app}'));
+  if not RunPowerShell('Add-AppxPackage -Path $env:CROPPDF_MSIX -ExternalLocation $env:CROPPDF_LOCATION -AllowUnsigned') then
     MsgBox(CustomMessage('MenuNotRegistered'), mbInformation, MB_OK);
 end;
 
