@@ -24,7 +24,7 @@ and the app icon in the taskbar when started from it.
 The repository is public and CI passes on push (tests, full build, installer uploaded as the `CropPdf-Setup`
 artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
 `CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for 1.0.0 (bilingual), 1.1.0-beta.1 and
-1.1.0 (English; the 1.1.0 notes link to the code signing and privacy policies).
+1.1.0 (English; the 1.1.0 notes link to the privacy policy).
 
 **Updates, released as `v1.1.0-beta.1` (pre-release, Beta channel only; Stable “latest” is still 1.0.0)**:
 startup check of the GitHub Releases, “new version” bar in the main window, *Updates* card in Settings (status,
@@ -40,10 +40,13 @@ Beta channel offered 1.1.0-beta.1, downloaded it, installed it after UAC (first 
 link in the About card. Users of 1.0.0 install it by hand once (1.0.0 has no update check); later versions are
 offered by the app.
 
-**Code signing (SignPath Foundation), chosen over the Microsoft Store**: the “Code signing policy” section is in
-both READMEs, online (status note: not signed yet). Application form answers prepared (project name `CropPdf`,
-download URL `…/CropPdf#installation`, privacy policy URL `…/CropPdf#privacy-policy`); the weak point is
-reputation (brand-new project). Remaining steps are listed under “To do”.
+**Code signing: postponed** (author's decision, October 9, 2026: not needed for now; SmartScreen only shows on
+the first manual install, updates from the app do not get it). SignPath Foundation is the chosen route for later
+(over the Microsoft Store). The “Code signing policy” section was written then removed from the READMEs (text in
+commit `0f1ec85`, restore it before applying); the “Privacy policy” section stays. Application form answers:
+project name `CropPdf`, category Productivity, maintainer type individual, build system GitHub Actions, download
+URL `…/CropPdf#installation` (that page must mention SignPath), privacy policy URL `…/CropPdf#privacy-policy`;
+the weak point is reputation (brand-new project).
 
 Not verified yet:
 - printing on a physical printer, especially shipping labels on a label printer (the main use case);
@@ -61,7 +64,7 @@ Next steps:
 1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
    path and the relaunch; also try declining the UAC prompt once.
 2. Print shipping labels on the label printer (the main use case, see “Not verified yet”).
-3. SignPath Foundation: MFA, then the application (see “To do” → Signing).
+3. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
 
 ## Commands
 
@@ -181,8 +184,9 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   They describe the changes, how to install (SmartScreen, UAC) and give the installer's SHA-256 (asset `digest`).
   Once releases are signed, they must also link to the README's “Code signing policy” (SignPath requirement for
   download pages).
-- The README's **privacy policy** (in “Code signing policy”) lists every network access of the app: keep it in
-  step with the code (today only the update check, the update download and links opened on click).
+- The README's **Privacy policy** section (`#privacy-policy`, linked from the 1.1.0 release notes) lists every
+  network access of the app: keep it in step with the code (today only the update check, the update download and
+  links opened on click).
 - Comments explain *why*, not *what*.
 - `.ps1` and `.iss` files are **UTF-8 with BOM** and CRLF (Windows PowerShell 5.1 and Inno Setup misread
   BOM-less UTF-8), see `.editorconfig`. Scripts must stay compatible with Windows PowerShell 5.1.
@@ -262,16 +266,18 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   drawn with Direct2D (`ID2D1PrintControl`). Several hundred lines, most likely native code (could live next to
   `CropPdf.Shell`). Worth it only if the preview is missed in daily use.
 - Signing (findings from October 2026, to re-check before acting):
-  - **SignPath Foundation** (chosen): free for open source. Requires an OSI license with no proprietary parts, an
-    existing release and active maintenance, MFA for the whole team, builds in CI with a manual approval of each
-    release, and a “Code signing policy” section on the project page (done in the READMEs). The certificate is
+  - **SignPath Foundation** (chosen, postponed): free for open source. Requires an OSI license with no proprietary
+    parts, an existing release and active maintenance, MFA for the whole team, builds in CI with a manual approval
+    of each release, and a “Code signing policy” section on the project page (written in commit `0f1ec85`, then
+    removed while signing is postponed). The certificate is
     issued to SignPath Foundation, which is shown as the publisher. The manifest `Publisher` must then become
     `CN=SignPath Foundation, O=SignPath Foundation, L=Lewes, S=Delaware, C=US`. Once signed, the package can be
     registered per user without admin rights (no more `-AllowUnsigned`).
-    Remaining: (1) MFA on GitHub (author); (2) maybe an installer option for the update check, see below;
-    (3) apply on signpath.org (author); (4) once accepted: SignPath GitHub integration and CI signing step with
-    manual approval, manifest `Publisher`, installer without `-AllowUnsigned` (possibly per-user, no UAC), release
-    notes linking to the policy, README status note removed.
+    Steps when resuming: (1) restore the “Code signing policy” section (commit `0f1ec85`); (2) MFA on GitHub
+    (author); (3) maybe an installer option for the update check, see below; (4) apply on signpath.org (author);
+    (5) once accepted: SignPath GitHub integration and CI signing step with manual approval, manifest `Publisher`,
+    installer without `-AllowUnsigned` (possibly per-user, no UAC), release notes linking to the policy, README
+    status note removed.
     Their rules (draft terms): software that sends data to systems the user did not choose must show its privacy
     policy during installation and offer an installation option to turn it off. The startup update check sends
     no user data (only the request itself: IP and version reach GitHub) and can be turned off in Settings; if

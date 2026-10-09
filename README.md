@@ -181,25 +181,7 @@ it. The final `1.3.0` is then offered to everyone (it is newer than any `1.3.0-b
 - [ ] ARM64 build.
 - [ ] More languages.
 
-## Code signing policy
-
-> **Status:** application to SignPath Foundation in preparation. Until it is accepted, releases are **not signed**
-> (hence the SmartScreen warning, see [Installation](#installation)).
-
-Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
-
-- **What is signed:** only files built from this repository by its GitHub Actions workflow, from a version tag:
-  the installer `CropPdf-Setup-<version>.exe`, the app (`CropPdf.exe`, `CropPdf.dll`, `CropPdf.Core.dll`), the
-  context menu DLL (`CropPdfMenu.dll`) and the context menu package (`CropPdf.Menu.msix`). Third-party components
-  (PDFsharp) are not signed with this certificate.
-- **Approval:** every release is approved manually before it is signed.
-
-Team roles and their members:
-
-- Committers and reviewers: [QuentinPerou](https://github.com/quentinperou)
-- Approvers: [QuentinPerou](https://github.com/quentinperou)
-
-### Privacy policy
+## Privacy policy
 
 This program will not transfer any information to other networked systems unless specifically requested by the
 user, with one exception: the **update check**. The PDF files you open, crop or print never leave your computer.
