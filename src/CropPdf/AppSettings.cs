@@ -20,9 +20,15 @@ public sealed class AppSettings
     /// <summary><see cref="SystemLanguage"/> or one of <see cref="SupportedLanguages"/>.</summary>
     public string Language { get; set; } = SystemLanguage;
 
-    /// <summary>Print mode used last; Ctrl+P prints with it.</summary>
+    /// <summary>Print mode used last, preselected in the print window.</summary>
     [JsonConverter(typeof(JsonStringEnumConverter<PrintScaling>))]
     public PrintScaling PrintScaling { get; set; } = PrintScaling.FitToPaper;
+
+    /// <summary>Printer used last (full queue name), preselected in the print window.</summary>
+    public string? PrintPrinter { get; set; }
+
+    /// <summary>Paper used last on each printer (<see cref="PaperSize.Id"/>): a label printer keeps its label.</summary>
+    public Dictionary<string, string> PrintPapers { get; set; } = [];
 
     /// <summary>Ask GitHub for a newer version when the app starts.</summary>
     public bool CheckForUpdatesAtStartup { get; set; } = true;

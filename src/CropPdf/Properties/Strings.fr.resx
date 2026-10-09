@@ -162,13 +162,13 @@ Les {2} autres pages seront supprimées définitivement.
     <value>Imprimer la zone sélectionnée, sans enregistrer (Ctrl+P)</value>
   </data>
   <data name="PrintFit" xml:space="preserve">
-    <value>Imprimer – ajuster au papier</value>
+    <value>Ajuster au papier</value>
   </data>
   <data name="PrintFitTooltip" xml:space="preserve">
     <value>Remplit la feuille ou l&apos;étiquette, pivotée d&apos;un quart de tour si elle rentre mieux</value>
   </data>
   <data name="PrintActualSize" xml:space="preserve">
-    <value>Imprimer – taille réelle</value>
+    <value>Taille réelle</value>
   </data>
   <data name="PrintActualSizeTooltip" xml:space="preserve">
     <value>Imprime à 100 %, centrée (réduite seulement si elle dépasse du papier)</value>
@@ -181,6 +181,48 @@ Les {2} autres pages seront supprimées définitivement.
   </data>
   <data name="ErrorPrint" xml:space="preserve">
     <value>L&apos;impression a échoué : {0}</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Imprimer</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="PrintPrinter" xml:space="preserve">
+    <value>Imprimante</value>
+  </data>
+  <data name="PrintPaper" xml:space="preserve">
+    <value>Papier</value>
+  </data>
+  <data name="PrintSize" xml:space="preserve">
+    <value>Taille</value>
+  </data>
+  <data name="PrintMoreSettings" xml:space="preserve">
+    <value>Autres réglages…</value>
+  </data>
+  <data name="PrintMoreSettingsTooltip" xml:space="preserve">
+    <value>Ouvre la fenêtre d&apos;impression de Windows, pour les options propres à l&apos;imprimante (copies, coupe…)</value>
+  </data>
+  <data name="PrintLoading" xml:space="preserve">
+    <value>Lecture des réglages de l&apos;imprimante…</value>
+  </data>
+  <data name="PrintNoPrinter" xml:space="preserve">
+    <value>Aucune imprimante n&apos;est installée.</value>
+  </data>
+  <data name="PrintPaperSize" xml:space="preserve">
+    <value>{0} × {1} mm</value>
+  </data>
+  <data name="PrintPaperNamed" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="PrintSizeInfo" xml:space="preserve">
+    <value>Taille imprimée : {0} × {1} mm ({2} %)</value>
+  </data>
+  <data name="PrintTurnedInfo" xml:space="preserve">
+    <value>, tournée d&apos;un quart de tour</value>
+  </data>
+  <data name="ErrorPrinter" xml:space="preserve">
+    <value>Impossible de lire les réglages de cette imprimante : {0}</value>
   </data>
   <data name="UpdatesTitle" xml:space="preserve">
     <value>Mises à jour</value>

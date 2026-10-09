@@ -162,13 +162,13 @@ Overwrite the original file?</value>
     <value>Print the selected area, without saving (Ctrl+P)</value>
   </data>
   <data name="PrintFit" xml:space="preserve">
-    <value>Print – fit to paper</value>
+    <value>Fit to paper</value>
   </data>
   <data name="PrintFitTooltip" xml:space="preserve">
     <value>Fills the sheet or label, turned a quarter if it fits better</value>
   </data>
   <data name="PrintActualSize" xml:space="preserve">
-    <value>Print – actual size</value>
+    <value>Actual size</value>
   </data>
   <data name="PrintActualSizeTooltip" xml:space="preserve">
     <value>Prints at 100 %, centered (reduced only if larger than the paper)</value>
@@ -181,6 +181,48 @@ Overwrite the original file?</value>
   </data>
   <data name="ErrorPrint" xml:space="preserve">
     <value>Printing failed: {0}</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PrintPrinter" xml:space="preserve">
+    <value>Printer</value>
+  </data>
+  <data name="PrintPaper" xml:space="preserve">
+    <value>Paper</value>
+  </data>
+  <data name="PrintSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="PrintMoreSettings" xml:space="preserve">
+    <value>More settings…</value>
+  </data>
+  <data name="PrintMoreSettingsTooltip" xml:space="preserve">
+    <value>Opens the Windows print dialog, for the printer's own options (copies, cutting…)</value>
+  </data>
+  <data name="PrintLoading" xml:space="preserve">
+    <value>Reading the printer settings…</value>
+  </data>
+  <data name="PrintNoPrinter" xml:space="preserve">
+    <value>No printer is installed.</value>
+  </data>
+  <data name="PrintPaperSize" xml:space="preserve">
+    <value>{0} × {1} mm</value>
+  </data>
+  <data name="PrintPaperNamed" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="PrintSizeInfo" xml:space="preserve">
+    <value>Printed size: {0} × {1} mm ({2} %)</value>
+  </data>
+  <data name="PrintTurnedInfo" xml:space="preserve">
+    <value>, turned a quarter</value>
+  </data>
+  <data name="ErrorPrinter" xml:space="preserve">
+    <value>Cannot read the settings of this printer: {0}</value>
   </data>
   <data name="UpdatesTitle" xml:space="preserve">
     <value>Updates</value>

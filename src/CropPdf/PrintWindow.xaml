@@ -1,0 +1,97 @@
+<Window x:Class="CropPdf.PrintWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CropPdf"
+        Title="{local:Tr Print}"
+        Width="920" Height="640" MinWidth="720" MinHeight="540"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+
+  <Window.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+      <Setter Property="Margin" Value="0,16,0,6" />
+    </Style>
+
+    <Style x:Key="OptionDescription" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+    </Style>
+  </Window.Resources>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="340" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Preview: the sheet as it will come out of the printer, scaled to the panel. -->
+    <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,1,0">
+      <Grid>
+        <DockPanel>
+          <TextBlock x:Name="SizeText" DockPanel.Dock="Bottom" HorizontalAlignment="Center" TextAlignment="Center"
+                     TextWrapping="Wrap" Margin="24,0,24,20" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+          <Viewbox Margin="40" Stretch="Uniform">
+            <Border x:Name="PaperSheet" Background="White" Visibility="Hidden">
+              <Border.Effect>
+                <DropShadowEffect BlurRadius="14" ShadowDepth="2" Direction="270" Opacity="0.25" />
+              </Border.Effect>
+            </Border>
+          </Viewbox>
+        </DockPanel>
+        <ProgressBar x:Name="BusyBar" IsIndeterminate="True" VerticalAlignment="Top" Height="3"
+                     IsHitTestVisible="False" Visibility="Collapsed" />
+      </Grid>
+    </Border>
+
+    <!-- Options -->
+    <DockPanel Grid.Column="1" Margin="24,20,24,24">
+      <TextBlock DockPanel.Dock="Top" Text="{local:Tr Print}" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,4" />
+
+      <StackPanel DockPanel.Dock="Bottom">
+        <Button x:Name="MoreSettingsButton" HorizontalAlignment="Stretch" Margin="0,0,0,12"
+                Content="{local:Tr PrintMoreSettings}" ToolTip="{local:Tr PrintMoreSettingsTooltip}"
+                Click="MoreSettings_Click" />
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Button Content="{local:Tr Cancel}" HorizontalAlignment="Stretch" IsCancel="True" />
+          <Button x:Name="PrintButton" Grid.Column="2" HorizontalAlignment="Stretch" IsDefault="True" IsEnabled="False"
+                  Style="{DynamicResource AccentButtonStyle}" Content="{local:Tr Print}" Click="Print_Click" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel>
+        <TextBlock Style="{StaticResource FieldLabel}" Text="{local:Tr PrintPrinter}" />
+        <ComboBox x:Name="PrinterBox" HorizontalAlignment="Stretch" SelectionChanged="PrinterBox_SelectionChanged"
+                  AutomationProperties.Name="{local:Tr PrintPrinter}" />
+
+        <TextBlock Style="{StaticResource FieldLabel}" Text="{local:Tr PrintPaper}" />
+        <ComboBox x:Name="PaperBox" HorizontalAlignment="Stretch" SelectionChanged="PaperBox_SelectionChanged"
+                  AutomationProperties.Name="{local:Tr PrintPaper}" />
+
+        <TextBlock Style="{StaticResource FieldLabel}" Text="{local:Tr PrintSize}" />
+        <RadioButton x:Name="FitRadio" GroupName="Scaling" Checked="Scaling_Checked"
+                     AutomationProperties.Name="{local:Tr PrintFit}">
+          <StackPanel>
+            <TextBlock Text="{local:Tr PrintFit}" />
+            <TextBlock Style="{StaticResource OptionDescription}" Text="{local:Tr PrintFitTooltip}" />
+          </StackPanel>
+        </RadioButton>
+        <RadioButton x:Name="ActualSizeRadio" GroupName="Scaling" Margin="0,10,0,0" Checked="Scaling_Checked"
+                     AutomationProperties.Name="{local:Tr PrintActualSize}">
+          <StackPanel>
+            <TextBlock Text="{local:Tr PrintActualSize}" />
+            <TextBlock Style="{StaticResource OptionDescription}" Text="{local:Tr PrintActualSizeTooltip}" />
+          </StackPanel>
+        </RadioButton>
+
+        <TextBlock x:Name="StatusText" Margin="0,20,0,0" TextWrapping="Wrap" Visibility="Collapsed" />
+      </StackPanel>
+    </DockPanel>
+  </Grid>
+</Window>

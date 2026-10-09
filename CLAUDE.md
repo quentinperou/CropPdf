@@ -48,8 +48,16 @@ project name `CropPdf`, category Productivity, maintainer type individual, build
 URL `…/CropPdf#installation` (that page must mention SignPath), privacy policy URL `…/CropPdf#privacy-policy`;
 the weak point is reputation (brand-new project).
 
+**`v1.2.0-beta.1` (pre-release, Beta channel)**: the **print window** (printer, paper incl. driver label sizes,
+fit/actual size, live preview, printer and paper remembered, *More settings…* → Windows dialog), the installer fix
+for quotes in the install folder, and the CI on Node 24 actions (this release is the first run of the new release
+job). 68 unit tests pass. The window was checked on screen through a harness (A4 and a 55 × 85 mm card, light/dark,
+English/French) and validated by the author, including a print to Microsoft Print to PDF matching the preview. This
+PC has no label printer (only Fax, Print to PDF, XPS Writer, OneNote).
+
 Not verified yet:
-- printing on a physical printer, especially shipping labels on a label printer (the main use case);
+- shipping labels on the label printer from the print window (the main use case): do its label sizes show up in
+  the paper list, is the printable area right, does the label come out right;
 - an English Windows: the “Crop PDF” menu label was only checked with `LoadString` under a forced thread UI
   language, and the installer language auto-selection was only seen in French;
 - Windows 10 (classic menu only);
@@ -63,7 +71,8 @@ Not verified yet:
 Next steps:
 1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
    path and the relaunch; also try declining the UAC prompt once.
-2. Print shipping labels on the label printer (the main use case, see “Not verified yet”).
+2. On the label printer's PC (Crop PDF 1.1.0 installed, Beta channel): update to 1.2.0-beta.1 from the app, then
+   print shipping labels from the print window. If all is well, release the final `v1.2.0`.
 3. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
 
 ## Commands
@@ -99,8 +108,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 | Folder | Role |
 |--------|------|
-| `src/CropPdf.Core` | Pure, tested logic: `CropGeometry` (screen → PDF coordinates), `PdfCropper` (writing with PDFsharp), `OutputPath` (`_crop` name), `PrintLayout` (size/rotation on the sheet), `CropAreaTooSmallException`, `SemanticVersion` (SemVer parsing/ordering), `UpdateFeed` (GitHub Releases: parsing, channel choice, download, SHA-256 check). No UI text. |
-| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, updates), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
+| `src/CropPdf.Core` | Pure, tested logic: `CropGeometry` (screen → PDF coordinates), `PdfCropper` (writing with PDFsharp), `OutputPath` (`_crop` name), `PrintLayout` (size/rotation on the sheet), `PrintSchema` (paper sizes from a driver's PrintCapabilities XML, partial paper ticket), `CropAreaTooSmallException`, `SemanticVersion` (SemVer parsing/ordering), `UpdateFeed` (GitHub Releases: parsing, channel choice, download, SHA-256 check). No UI text. |
+| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, updates, print choices), `PrintWindow` + `Printing` (print window, printers, sheet, job), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
 | `src/CropPdf.Shell` | C++ DLL (WRL) implementing `IExplorerCommand`: has File Explorer start `CropPdf.exe "<file>"`, located next to it. Localized label in `CropPdfMenu.rc`. |
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
 | `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |
@@ -128,13 +137,24 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   memory first, so overwriting the original works.
 - **Framework-dependent app** (small installer): the installer offers to install the .NET 10 Desktop Runtime.
 - DLL built with the **static CRT** (`/MT`): no dependency on the Visual C++ redistributable.
-- **Printing** (`MainWindow.PrintAsync`): nothing is saved. WPF `PrintDialog` + `PrintVisual`; the selected area is
-  rendered by `Windows.Data.Pdf` with `SourceRect` (displayed coordinates, rotation included — verified on a
-  `/Rotate 90` page) at the printer resolution (`PrintTicket.PageResolution`, 300 dpi by default), then laid out
-  in the printable area (`PrintCapabilities.PageImageableArea`, the visual is arranged at its origin) by
-  `PrintLayout`: *fit to paper* (turned a quarter when that gives a bigger print) or *actual size* (reduced only
-  when too large, never turned). The mode used last is saved (`AppSettings.PrintScaling`) and reused by `Ctrl+P`.
-  The print button is deliberately discreet (icon only, like Settings), as asked by the author.
+- **Printing** (`PrintWindow`, `Printing`, `PrintSchema`): nothing is saved. The print button / `Ctrl+P` open our own
+  print window (chosen over a preview inside the Windows dialog, see “To do”): printer, paper, *fit to paper* /
+  *actual size*, live preview, Print (`Enter`), and *More settings…* which hands over to WPF's `PrintDialog`.
+  - Papers come from the driver's **PrintCapabilities XML** (`PrintSchema.ReadPaperSizes`), not WPF's object
+    model: label printers declare their labels as driver-specific options (own namespace) with a localized
+    `DisplayName`. The choice is applied by name through a partial ticket (`PrintSchema.PaperTicket`, also forcing
+    portrait) merged with `MergeAndValidatePrintTicket`; the printable area then comes from
+    `GetPrintCapabilities(ticket).PageImageableArea` (`PrintSheet`).
+  - Driver calls run on a background **STA thread** with their own `PrintQueue` (network printers can be slow);
+    tickets cross threads as XML. Shared printers are opened as `\\server\printer` (`Printing.OpenQueue`).
+  - The area is rendered by `Windows.Data.Pdf` with `SourceRect` (displayed coordinates, rotation included —
+    verified on a `/Rotate 90` page) at the printer resolution (`PageResolution`, 300 dpi by default), laid out by
+    `PrintLayout`: *fit to paper* (turned a quarter when that gives a bigger print) or *actual size* (reduced only
+    when too large, never turned). `Printing.BuildPage` builds the sheet (area centered in the printable part);
+    the preview shows the same element with a lower-resolution bitmap, plus the printable area dashed. The job is
+    sent with `PrintQueue.CreateXpsDocumentWriter(queue).Write(page, ticket)`, job name in `CurrentJobSettings`.
+  - Remembered (`AppSettings`): `PrintPrinter`, `PrintPapers` (paper per printer), `PrintScaling`, saved on Print.
+  - The print button is deliberately discreet (icon only, like Settings), as asked by the author.
 - **Updates** (`Updater`, `UpdateFeed`): the source is the GitHub Releases of `quentinperou/CropPdf`
   (`/releases?per_page=30`, unauthenticated: 60 requests/hour per IP, a failure at startup is silent). A release
   counts if it is not a draft, its tag parses as SemVer and it has a `CropPdf-Setup-*.exe` asset. *Stable* =
@@ -225,12 +245,17 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 - The first launch after an install is slower (cold .NET start): wait a few seconds before checking the window.
 - After moving or renaming the project folder, CMake refuses the old cache in `build\shell` ("CMakeCache.txt
   directory is different"): delete `build\shell` and build again.
-- On Windows 11, WPF's `PrintDialog` appears as the **modern print dialog**, hosted by `explorer.exe` (window
-  “Crop PDF – Imprimer”, class `ApplicationFrameWindow`), and shows “This app doesn't support print preview”
-  (classic printing API, see “To do”).
-- **Never automate the print dialog on a machine with real printers.** UI Automation reported “Microsoft Print to
-  PDF” as selected while the list still showed the default printer (a label printer): a click on Print could have
-  wasted labels. Test printing by hand, or check the layout through `PrintLayout` tests.
+- On Windows 11, WPF's `PrintDialog` (*More settings…*) appears as the **modern print dialog**, hosted by
+  `explorer.exe` (window “Crop PDF – Imprimer”, class `ApplicationFrameWindow`), and shows “This app doesn't
+  support print preview” (classic printing API, see “To do”). It may ignore the ticket it is given (dotnet/wpf#8355).
+- **Never automate printing on a machine with real printers** (the Windows dialog or the *Print* button of our
+  window). UI Automation once reported “Microsoft Print to PDF” as selected while the list still showed the default
+  printer (a label printer): a click on Print could have wasted labels. Test printing by hand, or check the layout
+  through `PrintLayout` tests and the preview.
+- A selection cannot be drawn with posted mouse messages (WPF checks the real button state). To look at the print
+  window without drawing, use a small harness project (outside the repo) that references `src\CropPdf\CropPdf.csproj`,
+  creates an `Application` with `ThemeMode`, loads a `PdfPageRenderer` and shows `new PrintWindow(new PrintRequest(...))`;
+  give it `<ApplicationIcon>` (windows take the exe's icon) and capture it with `PrintWindow`.
 
 ## Debugging the context menu
 
@@ -252,7 +277,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 - `tests/CropPdf.Tests` (xUnit) covers `CropPdf.Core`: geometry (rotations, offset CropBox, bounds) and produced
   files (single page, boxes, rotation kept, overwrite, `_crop` name), print layout, updates (`SemanticVersion`
   ordering, `UpdateFeed` parsing of a GitHub-shaped JSON, Stable/Beta choice, checksum, download through a fake
-  `HttpMessageHandler`), plus `LocalizationTests`.
+  `HttpMessageHandler`), print schema (paper sizes of a label driver, prefixes, selected paper, partial ticket),
+  plus `LocalizationTests`.
 - The UI is checked by hand: open the PDF from `tools\SamplePdf` (rotated page, page with an existing CropBox),
   draw, save, reopen the result.
 - The UI can also be driven with UI Automation (`System.Windows.Automation`) without moving the mouse: icon
@@ -263,11 +289,14 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 ## To do (see also the README)
 
-- **Print preview** in the Windows 11 print dialog (idea kept by the author for later): requires the modern print
-  API instead of WPF's `PrintDialog`: `PrintManager` (through `IPrintManagerInterop` for a window handle) with an
-  `IPrintDocumentSource` that provides preview pages (`IPrintPreviewPageCollection`) and the final document,
-  drawn with Direct2D (`ID2D1PrintControl`). Several hundred lines, most likely native code (could live next to
-  `CropPdf.Shell`). Worth it only if the preview is missed in daily use.
+- **Preview inside the Windows 11 print dialog**: not planned (audit of October 9, 2026; our print window was built
+  instead). It would need `IPrintManagerInterop` (HWND) → `PrintTask` with an `IPrintDocumentSource` that also
+  implements `IPrintDocumentPageSource` and `IPrintPreviewPageCollection` (Paginate/MakePage, called again on every
+  option change), preview pages drawn on DXGI surfaces (`IPrintPreviewDxgiPackageTarget::DrawPage`) and the job
+  through `ID2D1PrintControl` (off the UI thread, multithreaded D2D factory). WPF has nothing built in; no desktop
+  toolkit does it. Best as a separate C++/WinRT DLL (not in `CropPdfMenu.dll`) taking its layout from C#: about
+  600–900 lines of C++, 1–2 weeks, risky (threading, DPI, `IPdfRendererNative::RenderPageToDeviceContext`
+  documented as UWP-only). `PrintTaskOptions.GetPageDescription` would give the page and imageable sizes.
 - Signing (findings from October 2026, to re-check before acting):
   - **SignPath Foundation** (chosen, postponed): free for open source. Requires an OSI license with no proprietary
     parts, an existing release and active maintenance, MFA for the whole team, builds in CI with a manual approval

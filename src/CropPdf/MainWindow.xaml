@@ -82,18 +82,7 @@
         <!-- Discreet on purpose: printing is secondary to saving. -->
         <Button x:Name="PrintButton" Style="{StaticResource SubtleButton}" Margin="0,0,6,0" Click="Print_Click"
                 ToolTip="{local:Tr PrintTooltip}" AutomationProperties.Name="{local:Tr PrintTooltip}">
-          <Button.ContextMenu>
-            <ContextMenu x:Name="PrintMenu" Placement="Bottom">
-              <MenuItem x:Name="PrintFitItem" Header="{local:Tr PrintFit}" ToolTip="{local:Tr PrintFitTooltip}"
-                        Click="PrintFit_Click" />
-              <MenuItem x:Name="PrintActualSizeItem" Header="{local:Tr PrintActualSize}" ToolTip="{local:Tr PrintActualSizeTooltip}"
-                        Click="PrintActualSize_Click" />
-            </ContextMenu>
-          </Button.ContextMenu>
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Style="{StaticResource Glyph}" Text="&#xE749;" />
-            <TextBlock Style="{StaticResource Glyph}" FontSize="8" Margin="4,2,0,0" Text="&#xE70D;" />
-          </StackPanel>
+          <TextBlock Style="{StaticResource Glyph}" Text="&#xE749;" />
         </Button>
 
         <Button x:Name="OverwriteButton" Padding="12,6" Margin="0,0,6,0"

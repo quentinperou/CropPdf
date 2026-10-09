@@ -22,10 +22,14 @@
   - **Save a copy**: creates `name_crop.pdf` next to the original (`name_crop_2.pdf`… if the name is taken);
   - **Overwrite original**: replaces the original file (asks for confirmation when it has several pages).
 - **The saved file contains only the cropped page**: the other pages are removed.
-- **Print the cropped area directly**, without saving anything (printer button or `Ctrl+P`):
+- **Print the cropped area directly**, without saving anything (printer button or `Ctrl+P`), from a print window
+  with a **live preview of the sheet**:
+  - printer and paper, label sizes of label printers included;
   - *fit to paper*: fills the sheet or the label, turned a quarter when it fits better (ideal for shipping
     labels on a label printer);
-  - *actual size*: 100 %, centered, only reduced when larger than the paper.
+  - *actual size*: 100 %, centered, only reduced when larger than the paper;
+  - the printer and paper used last are remembered: printing the next label is one click (or `Enter`);
+  - *More settings…* opens the Windows print dialog for the printer's own options (copies, cutting…).
 - Lossless: text stays selectable and vector graphics stay vector.
 - Windows 11 look (Fluent, Mica) that **follows the light/dark theme** and the accent color of Windows.
 - **English and French**: the app, the context menu and the installer follow the Windows display language;
@@ -40,7 +44,7 @@
 |--------|----------|
 | Open a PDF | `Ctrl+O` (or drop the file into the window) |
 | Save a copy | `Ctrl+S` |
-| Print the selected area | `Ctrl+P` (with the print mode used last) |
+| Print the selected area | `Ctrl+P` (print window, then `Enter` to print) |
 | Clear the selection | `Esc` |
 | Zoom | `Ctrl` + mouse wheel, `Ctrl` + `+` or `Ctrl` + `-` |
 | Fit to window | `Ctrl+0` |
@@ -177,7 +181,6 @@ it. The final `1.3.0` is then offered to everyone (it is newer than any `1.3.0-b
 
 - [ ] **Free signing** of the installer and package through [SignPath Foundation](https://signpath.org) (for open source projects that already have a release): no more SmartScreen warning, and no administrator rights needed for the menu.
 - [ ] Possibly, publishing on the **Microsoft Store** (free for individuals, the Store signs the app); the [Windows App Certification Kit](https://learn.microsoft.com/windows/uwp/debug-test-perf/windows-app-certification-kit) checks the app before submission ([GitHub action](https://github.com/marketplace/actions/run-the-windows-app-certification-kit)).
-- [ ] **Print preview** in the Windows 11 print dialog. It currently says “This app doesn't support print preview”: WPF prints through the classic printing API, which cannot provide preview pages. It needs the modern print API (`PrintManager` + `IPrintDocumentSource`, preview pages drawn with Direct2D).
 - [ ] ARM64 build.
 - [ ] More languages.
 

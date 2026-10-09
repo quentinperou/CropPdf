@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -231,10 +230,9 @@ public partial class MainWindow : Window
     // ---------------------------------------------------------------- Printing
 
     /// <summary>
-    /// Prints the selected area only, without saving anything: the area is rendered at the printer resolution
-    /// and laid out on the sheet according to <paramref name="scaling"/>.
+    /// Opens the print window for the selected area: nothing is saved, the area is printed as it is displayed.
     /// </summary>
-    private async Task PrintAsync(PrintScaling scaling)
+    private void OpenPrintWindow()
     {
         if (_renderer is null || _path is null || _busy)
             return;
@@ -244,75 +242,15 @@ public partial class MainWindow : Window
             return;
         }
 
-        var settings = AppSettings.Load();
-        settings.PrintScaling = scaling;
-        settings.Save();
-
-        var dialog = new PrintDialog();
-        if (dialog.ShowDialog() != true)
-            return;
-
-        var renderer = _renderer;
-        string jobName = Strings.Format("PrintJobName", Path.GetFileName(_path), page.Index + 1);
-        SetBusy(true);
-        try
-        {
-            // Printable part of the sheet, in WPF units (1/96 inch), from the printer's margins.
-            var sheet = new Size(dialog.PrintableAreaWidth, dialog.PrintableAreaHeight);
-            var imageable = dialog.PrintQueue.GetPrintCapabilities(dialog.PrintTicket).PageImageableArea;
-            var area = imageable is null
-                ? new Rect(sheet)
-                : new Rect(imageable.OriginWidth, imageable.OriginHeight, imageable.ExtentWidth, imageable.ExtentHeight);
-
-            // The selected area at 100 %, in WPF units.
-            double width = selection.Width * page.BaseWidth;
-            double height = selection.Height * page.BaseHeight;
-            var layout = PrintLayout.Compute(width, height, area.Width, area.Height, scaling);
-
-            int dpi = dialog.PrintTicket.PageResolution?.X ?? 300;
-            uint pixelWidth = (uint)Math.Clamp(Math.Ceiling(layout.Width / 96 * dpi), 16, 12000);
-            var bitmap = await renderer.RenderAreaAsync((uint)page.Index, selection, pixelWidth);
-
-            var image = new Image
-            {
-                Source = bitmap,
-                Stretch = Stretch.Fill,
-                Width = layout.Width,
-                Height = layout.Height,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                LayoutTransform = layout.Rotate ? new RotateTransform(90) : Transform.Identity,
-            };
-            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
-            var content = new Grid { Width = area.Width, Height = area.Height };
-            content.Children.Add(image);
-            content.Measure(sheet);
-            content.Arrange(area);
-
-            dialog.PrintVisual(content, jobName);
-            ShowInfo(Severity.Success, Strings.Format("SuccessPrint", dialog.PrintQueue.Name));
-        }
-        catch (Exception ex)
-        {
-            ShowInfo(Severity.Error, Strings.Format("ErrorPrint", Describe(ex)));
-        }
-        finally
-        {
-            SetBusy(false);
-        }
+        var request = new PrintRequest(_renderer, page.Index, selection,
+            selection.Width * page.BaseWidth, selection.Height * page.BaseHeight,
+            Strings.Format("PrintJobName", Path.GetFileName(_path), page.Index + 1));
+        var window = new PrintWindow(request) { Owner = this };
+        if (window.ShowDialog() == true && window.PrintedOn is { } printer)
+            ShowInfo(Severity.Success, Strings.Format("SuccessPrint", printer));
     }
 
-    private void Print_Click(object sender, RoutedEventArgs e)
-    {
-        var last = AppSettings.Load().PrintScaling;
-        PrintFitItem.IsChecked = last == PrintScaling.FitToPaper;
-        PrintActualSizeItem.IsChecked = last == PrintScaling.ActualSize;
-        PrintMenu.PlacementTarget = PrintButton;
-        PrintMenu.IsOpen = true;
-    }
-
-    private async void PrintFit_Click(object sender, RoutedEventArgs e) => await PrintAsync(PrintScaling.FitToPaper);
-    private async void PrintActualSize_Click(object sender, RoutedEventArgs e) => await PrintAsync(PrintScaling.ActualSize);
+    private void Print_Click(object sender, RoutedEventArgs e) => OpenPrintWindow();
 
     // Overwriting a multi-page document deletes the other pages for good: ask first.
     private bool ConfirmOverwrite(PageItem page, string path)
@@ -668,7 +606,7 @@ public partial class MainWindow : Window
                 _ = SaveAsync(overwrite: false);
                 break;
             case Key.P when ctrl:
-                _ = PrintAsync(AppSettings.Load().PrintScaling);
+                OpenPrintWindow();
                 break;
             case Key.OemPlus or Key.Add when ctrl:
                 ZoomBy(ZoomStep);

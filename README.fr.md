@@ -22,10 +22,16 @@
   - **Enregistrer une copie** : crée `nom_crop.pdf` à côté de l'original (`nom_crop_2.pdf`… si le nom est déjà pris) ;
   - **Écraser l'original** : remplace le fichier d'origine (confirmation demandée s'il a plusieurs pages).
 - **Le fichier produit ne contient que la page recadrée** : les autres pages sont retirées.
-- **Impression directe de la zone recadrée**, sans rien enregistrer (bouton imprimante ou `Ctrl+P`) :
+- **Impression directe de la zone recadrée**, sans rien enregistrer (bouton imprimante ou `Ctrl+P`), depuis une
+  fenêtre d'impression avec un **aperçu de la feuille en direct** :
+  - imprimante et papier, y compris les formats d'étiquettes des imprimantes d'étiquettes ;
   - *ajuster au papier* : remplit la feuille ou l'étiquette, pivotée d'un quart de tour si elle rentre mieux
     (idéal pour les étiquettes d'expédition sur une imprimante d'étiquettes) ;
-  - *taille réelle* : 100 %, centrée, réduite seulement si elle dépasse du papier.
+  - *taille réelle* : 100 %, centrée, réduite seulement si elle dépasse du papier ;
+  - l'imprimante et le papier utilisés la dernière fois sont mémorisés : imprimer l'étiquette suivante se fait en
+    un clic (ou `Entrée`) ;
+  - *Autres réglages…* ouvre la fenêtre d'impression de Windows pour les options propres à l'imprimante (copies,
+    coupe…).
 - Recadrage sans perte : le texte reste sélectionnable et le vectoriel reste vectoriel.
 - Interface Windows 11 (Fluent, Mica) qui **suit le thème clair/sombre** et la couleur d'accentuation de Windows.
 - **Français et anglais** : l'appli, le menu clic droit et l'installeur suivent la langue d'affichage de Windows ;
@@ -40,7 +46,7 @@
 |--------|-----------|
 | Ouvrir un PDF | `Ctrl+O` (ou glisser-déposer le fichier dans la fenêtre) |
 | Enregistrer une copie | `Ctrl+S` |
-| Imprimer la zone sélectionnée | `Ctrl+P` (avec le dernier mode d'impression utilisé) |
+| Imprimer la zone sélectionnée | `Ctrl+P` (fenêtre d'impression, puis `Entrée` pour imprimer) |
 | Effacer la sélection | `Échap` |
 | Zoomer | `Ctrl` + molette, `Ctrl` + `+` ou `Ctrl` + `-` |
 | Ajuster à la fenêtre | `Ctrl+0` |
@@ -179,7 +185,6 @@ voient proposer. La version finale `1.3.0` est ensuite proposée à tous (elle e
 
 - [ ] **Signature gratuite** de l'installeur et du package via [SignPath Foundation](https://signpath.org) (réservé aux projets open source ayant déjà une release) : plus d'avertissement SmartScreen, et plus besoin de droits administrateur pour le menu.
 - [ ] Éventuellement, publication sur le **Microsoft Store** (gratuit pour les particuliers, le Store signe l'application) ; le [Windows App Certification Kit](https://learn.microsoft.com/fr-fr/windows/uwp/debug-test-perf/windows-app-certification-kit) permet de vérifier l'appli avant soumission ([action GitHub](https://github.com/marketplace/actions/run-the-windows-app-certification-kit)).
-- [ ] **Aperçu avant impression** dans la fenêtre d'impression de Windows 11. Elle affiche pour l'instant « Cette application ne prend pas en charge l'aperçu avant impression » : WPF imprime avec l'ancienne interface d'impression de Windows, qui ne peut pas fournir de pages d'aperçu. Il faut passer par l'interface moderne (`PrintManager` + `IPrintDocumentSource`, pages d'aperçu dessinées avec Direct2D).
 - [ ] Version ARM64.
 - [ ] D'autres langues.
 
