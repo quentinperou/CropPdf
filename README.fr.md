@@ -183,6 +183,42 @@ voient proposer. La version finale `1.3.0` est ensuite proposée à tous (elle e
 - [ ] Version ARM64.
 - [ ] D'autres langues.
 
+## Politique de signature du code (code signing policy)
+
+> **État :** candidature à SignPath Foundation en préparation. Tant qu'elle n'est pas acceptée, les versions
+> publiées **ne sont pas signées** (d'où l'avertissement SmartScreen, voir [Installation](#installation)).
+
+Signature de code gratuite fournie par [SignPath.io](https://about.signpath.io), certificat de [SignPath Foundation](https://signpath.org).
+
+- **Ce qui est signé :** uniquement les fichiers compilés depuis ce dépôt par son workflow GitHub Actions, à partir
+  d'un tag de version : l'installeur `CropPdf-Setup-<version>.exe`, l'application (`CropPdf.exe`, `CropPdf.dll`,
+  `CropPdf.Core.dll`), la DLL du menu clic droit (`CropPdfMenu.dll`) et son package (`CropPdf.Menu.msix`). Les
+  composants tiers (PDFsharp) ne sont pas signés avec ce certificat.
+- **Approbation :** chaque version est approuvée manuellement avant d'être signée.
+
+Rôles dans l'équipe et leurs membres :
+
+- Contributeurs et relecteurs : [QuentinPerou](https://github.com/quentinperou)
+- Approbateurs : [QuentinPerou](https://github.com/quentinperou)
+
+### Confidentialité
+
+Ce programme ne transmet aucune information à d'autres systèmes en réseau sans demande explicite de
+l'utilisateur, à une exception près : la **recherche de mises à jour**. Les PDF que vous ouvrez, recadrez ou
+imprimez ne quittent jamais votre ordinateur.
+
+- **Recherche de mises à jour :** au démarrage de l'appli, et quand vous cliquez sur *Rechercher des mises à jour*,
+  elle envoie une requête HTTPS à l'API de GitHub (`api.github.com`) pour lire la liste des versions publiées de ce
+  dépôt. La requête ne contient aucune donnée personnelle ni rien sur vos fichiers ; comme toute requête web, elle
+  permet à GitHub de voir votre adresse IP et la version de l'appli (User-Agent). La
+  [déclaration de confidentialité de GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)
+  s'applique. La recherche au démarrage se désactive dans **Paramètres → Mises à jour → Rechercher les mises à
+  jour au démarrage**.
+- **Téléchargement d'une mise à jour :** le nouvel installeur n'est téléchargé depuis GitHub que lorsque vous
+  cliquez sur **Mettre à jour**.
+- **Liens** (*Nouveautés*, *Code source sur GitHub*…) : ils ne s'ouvrent dans votre navigateur que lorsque vous
+  cliquez dessus.
+
 ## Licence
 
 [MIT](LICENSE.md). Utilise [PDFsharp](https://github.com/empira/PDFsharp) (MIT).

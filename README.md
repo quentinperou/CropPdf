@@ -181,6 +181,37 @@ it. The final `1.3.0` is then offered to everyone (it is newer than any `1.3.0-b
 - [ ] ARM64 build.
 - [ ] More languages.
 
+## Code signing policy
+
+> **Status:** application to SignPath Foundation in preparation. Until it is accepted, releases are **not signed**
+> (hence the SmartScreen warning, see [Installation](#installation)).
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **What is signed:** only files built from this repository by its GitHub Actions workflow, from a version tag:
+  the installer `CropPdf-Setup-<version>.exe`, the app (`CropPdf.exe`, `CropPdf.dll`, `CropPdf.Core.dll`), the
+  context menu DLL (`CropPdfMenu.dll`) and the context menu package (`CropPdf.Menu.msix`). Third-party components
+  (PDFsharp) are not signed with this certificate.
+- **Approval:** every release is approved manually before it is signed.
+
+Team roles and their members:
+
+- Committers and reviewers: [QuentinPerou](https://github.com/quentinperou)
+- Approvers: [QuentinPerou](https://github.com/quentinperou)
+
+### Privacy policy
+
+This program will not transfer any information to other networked systems unless specifically requested by the
+user, with one exception: the **update check**. The PDF files you open, crop or print never leave your computer.
+
+- **Update check:** when the app starts, and when you click *Check for updates*, it sends one HTTPS request to the
+  GitHub API (`api.github.com`) to read the list of releases of this repository. The request contains no personal
+  data and nothing about your files; like any web request, it lets GitHub see your IP address and the app version
+  (User-Agent). GitHub's [privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)
+  applies. The check at startup can be turned off in **Settings → Updates → Check for updates at startup**.
+- **Update download:** a new installer is downloaded from GitHub only when you click **Update**.
+- **Links** (*What's new*, *Source code on GitHub*…) open in your browser only when you click them.
+
 ## License
 
 [MIT](LICENSE.md). Uses [PDFsharp](https://github.com/empira/PDFsharp) (MIT).
