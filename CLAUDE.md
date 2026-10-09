@@ -23,7 +23,8 @@ Checked on screen by the author: the “Recadrer le PDF” entry with its icon i
 and the app icon in the taskbar when started from it.
 The repository is public and CI passes on push (tests, full build, installer uploaded as the `CropPdf-Setup`
 artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
-`CropPdf-Setup-1.0.0.exe` in the GitHub Release (release notes: only the auto-generated changelog link).
+`CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for 1.0.0 (bilingual), 1.1.0-beta.1 and
+1.1.0 (English; the 1.1.0 notes link to the code signing and privacy policies).
 
 **Updates, released as `v1.1.0-beta.1` (pre-release, Beta channel only; Stable “latest” is still 1.0.0)**:
 startup check of the GitHub Releases, “new version” bar in the main window, *Updates* card in Settings (status,
@@ -35,8 +36,14 @@ English/French. **Update path tested by the author**: a 0.9.0 build (run from ou
 Beta channel offered 1.1.0-beta.1, downloaded it, installed it after UAC (first install on this PC: package
 `Status : Ok`, classic verb registered) and the installed beta started; it then removed `%TEMP%\CropPdf-Update`.
 
-**v1.1.0 (stable)**: the update system of 1.1.0-beta.1, plus a “Source code on GitHub” link in the About card.
-Users of 1.0.0 install it by hand once (1.0.0 has no update check); later versions are offered by the app.
+**v1.1.0 is released (stable, “latest”)**: the update system of 1.1.0-beta.1, plus a “Source code on GitHub”
+link in the About card. Users of 1.0.0 install it by hand once (1.0.0 has no update check); later versions are
+offered by the app.
+
+**Code signing (SignPath Foundation), chosen over the Microsoft Store**: the “Code signing policy” section is in
+both READMEs, online (status note: not signed yet). Application form answers prepared (project name `CropPdf`,
+download URL `…/CropPdf#installation`, privacy policy URL `…/CropPdf#privacy-policy`); the weak point is
+reputation (brand-new project). Remaining steps are listed under “To do”.
 
 Not verified yet:
 - printing on a physical printer, especially shipping labels on a label printer (the main use case);
@@ -54,6 +61,7 @@ Next steps:
 1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
    path and the relaunch; also try declining the UAC prompt once.
 2. Print shipping labels on the label printer (the main use case, see “Not verified yet”).
+3. SignPath Foundation: MFA, then the application (see “To do” → Signing).
 
 ## Commands
 
@@ -171,6 +179,10 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   (English + French). The README exists in English and French: keep both in sync.
 - **Release notes** (GitHub Releases) are written in English only (since v1.1.0-beta.1; v1.0.0 is bilingual).
   They describe the changes, how to install (SmartScreen, UAC) and give the installer's SHA-256 (asset `digest`).
+  Once releases are signed, they must also link to the README's “Code signing policy” (SignPath requirement for
+  download pages).
+- The README's **privacy policy** (in “Code signing policy”) lists every network access of the app: keep it in
+  step with the code (today only the update check, the update download and links opened on click).
 - Comments explain *why*, not *what*.
 - `.ps1` and `.iss` files are **UTF-8 with BOM** and CRLF (Windows PowerShell 5.1 and Inno Setup misread
   BOM-less UTF-8), see `.editorconfig`. Scripts must stay compatible with Windows PowerShell 5.1.
@@ -250,11 +262,21 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   drawn with Direct2D (`ID2D1PrintControl`). Several hundred lines, most likely native code (could live next to
   `CropPdf.Shell`). Worth it only if the preview is missed in daily use.
 - Signing (findings from October 2026, to re-check before acting):
-  - **SignPath Foundation**: free for open source. Requires an OSI license with no proprietary parts, an existing
-    release and active maintenance, MFA for the whole team, builds in CI with a manual approval of each release,
-    and a “Code signing policy” section on the project page. The manifest `Publisher` must then become
+  - **SignPath Foundation** (chosen): free for open source. Requires an OSI license with no proprietary parts, an
+    existing release and active maintenance, MFA for the whole team, builds in CI with a manual approval of each
+    release, and a “Code signing policy” section on the project page (done in the READMEs). The certificate is
+    issued to SignPath Foundation, which is shown as the publisher. The manifest `Publisher` must then become
     `CN=SignPath Foundation, O=SignPath Foundation, L=Lewes, S=Delaware, C=US`. Once signed, the package can be
     registered per user without admin rights (no more `-AllowUnsigned`).
+    Remaining: (1) MFA on GitHub (author); (2) maybe an installer option for the update check, see below;
+    (3) apply on signpath.org (author); (4) once accepted: SignPath GitHub integration and CI signing step with
+    manual approval, manifest `Publisher`, installer without `-AllowUnsigned` (possibly per-user, no UAC), release
+    notes linking to the policy, README status note removed.
+    Their rules (draft terms): software that sends data to systems the user did not choose must show its privacy
+    policy during installation and offer an installation option to turn it off. The startup update check sends
+    no user data (only the request itself: IP and version reach GitHub) and can be turned off in Settings; if
+    SignPath considers it a data transfer, add an Inno Setup task (“Check for updates at startup”, with the
+    privacy note) whose choice becomes the default of `AppSettings.CheckForUpdatesAtStartup`.
   - Reference project for that setup: [dnGrep](https://github.com/dnGrep/dnGrep) (WPF + C++ `IExplorerCommand`
     DLL + sparse package, signed through SignPath, registered from the app).
   - **Microsoft Store**: free registration for individuals; the Store signs the package, but only a full MSIX
