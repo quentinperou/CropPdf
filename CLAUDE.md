@@ -23,8 +23,8 @@ Checked on screen by the author: the “Recadrer le PDF” entry with its icon i
 and the app icon in the taskbar when started from it.
 The repository is public and CI passes on push (tests, full build, installer uploaded as the `CropPdf-Setup`
 artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
-`CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for 1.0.0 (bilingual), 1.1.0-beta.1,
-1.1.0 and 1.2.0-beta.1 (English; the 1.1.0 notes link to the privacy policy).
+`CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for every release: 1.0.0 (bilingual),
+then English only (the 1.1.0 notes link to the privacy policy).
 
 **Updates, released as `v1.1.0-beta.1` (pre-release, Beta channel only; Stable “latest” is still 1.0.0)**:
 startup check of the GitHub Releases, “new version” bar in the main window, *Updates* card in Settings (status,
@@ -55,7 +55,7 @@ job). 68 unit tests pass. The window was checked on screen through a harness (A4
 English/French) and validated by the author, including a print to Microsoft Print to PDF matching the preview. This
 PC has no label printer (only Fax, Print to PDF, XPS Writer, OneNote).
 
-**On `main`, not released yet** (after 1.2.0-beta.1): a **Theme** card in Settings (system / light / dark, saved as
+**`v1.2.0-beta.2` (pre-release, Beta channel)**: everything in 1.2.0-beta.1, plus a **Theme** card in Settings (system / light / dark, saved as
 `AppSettings.Theme`, applied live to every window through `Application.ThemeMode` — checked through UI Automation:
 both windows, title bars included, switch at once), and settings of newer versions kept when an older one saves
 (`[JsonExtensionData]`; 1.1.0 and older still drop them, which lost the remembered printer once).
@@ -76,8 +76,8 @@ Not verified yet:
 Next steps:
 1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
    path and the relaunch; also try declining the UAC prompt once.
-2. On the label printer's PC (Crop PDF 1.1.0 installed, Beta channel): update to 1.2.0-beta.1 from the app, then
-   print shipping labels from the print window. If all is well, release the final `v1.2.0`.
+2. On the label printer's PC (Crop PDF 1.1.0 installed, Beta channel): update to the latest 1.2.0 beta from the
+   app, then print shipping labels from the print window. If all is well, release the final `v1.2.0`.
 3. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
 
 ## Commands
