@@ -22,6 +22,11 @@ public partial class SettingsWindow : Window
             LanguageBox.Items.Add(new LanguageOption(code, NativeName(code)));
         LanguageBox.SelectedItem = LanguageBox.Items.Cast<LanguageOption>().First(o => o.Code == _settings.Language);
 
+        ThemeBox.Items.Add(new ThemeOption(AppTheme.System, Strings.Get("ThemeSystem")));
+        ThemeBox.Items.Add(new ThemeOption(AppTheme.Light, Strings.Get("ThemeLight")));
+        ThemeBox.Items.Add(new ThemeOption(AppTheme.Dark, Strings.Get("ThemeDark")));
+        ThemeBox.SelectedItem = ThemeBox.Items.Cast<ThemeOption>().First(o => o.Theme == _settings.Theme);
+
         ChannelBox.Items.Add(new ChannelOption(UpdateChannel.Stable, Strings.Get("UpdateChannelStable")));
         ChannelBox.Items.Add(new ChannelOption(UpdateChannel.Beta, Strings.Get("UpdateChannelBeta")));
         ChannelBox.SelectedItem = ChannelBox.Items.Cast<ChannelOption>().First(o => o.Channel == _settings.UpdateChannel);
@@ -54,6 +59,17 @@ public partial class SettingsWindow : Window
         LanguageChanged = true;
         // The main window reloads in the new language and reopens this page.
         Close();
+    }
+
+    // Unlike the language, the theme switches live: no window needs to be rebuilt.
+    private void ThemeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_initialized || ThemeBox.SelectedItem is not ThemeOption option || option.Theme == _settings.Theme)
+            return;
+
+        _settings.Theme = option.Theme;
+        _settings.Save();
+        App.ApplyTheme(option.Theme);
     }
 
     // ---------------------------------------------------------------- Updates
@@ -176,6 +192,11 @@ public partial class SettingsWindow : Window
     }
 
     private sealed record ChannelOption(UpdateChannel Channel, string Name)
+    {
+        public override string ToString() => Name;
+    }
+
+    private sealed record ThemeOption(AppTheme Theme, string Name)
     {
         public override string ToString() => Name;
     }

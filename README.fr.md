@@ -33,7 +33,8 @@
   - *Autres réglages…* ouvre la fenêtre d'impression de Windows pour les options propres à l'imprimante (copies,
     coupe…).
 - Recadrage sans perte : le texte reste sélectionnable et le vectoriel reste vectoriel.
-- Interface Windows 11 (Fluent, Mica) qui **suit le thème clair/sombre** et la couleur d'accentuation de Windows.
+- Interface Windows 11 (Fluent, Mica) qui **suit le thème clair/sombre** et la couleur d'accentuation de Windows ;
+  le thème peut aussi être fixé en clair ou en sombre dans les **Paramètres**.
 - **Français et anglais** : l'appli, le menu clic droit et l'installeur suivent la langue d'affichage de Windows ;
   la langue de l'appli peut aussi être choisie dans les **Paramètres** (icône d'engrenage).
 - **Mises à jour en un clic** : au démarrage, l'appli consulte les Releases GitHub et propose la nouvelle version,

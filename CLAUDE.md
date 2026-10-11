@@ -23,8 +23,8 @@ Checked on screen by the author: the “Recadrer le PDF” entry with its icon i
 and the app icon in the taskbar when started from it.
 The repository is public and CI passes on push (tests, full build, installer uploaded as the `CropPdf-Setup`
 artifact). **v1.0.0 is released**: the `v1.0.0` tag (on the initial commit) ran the release job, which published
-`CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for 1.0.0 (bilingual), 1.1.0-beta.1 and
-1.1.0 (English; the 1.1.0 notes link to the privacy policy).
+`CropPdf-Setup-1.0.0.exe` in the GitHub Release. Release notes are written for 1.0.0 (bilingual), 1.1.0-beta.1,
+1.1.0 and 1.2.0-beta.1 (English; the 1.1.0 notes link to the privacy policy).
 
 **Updates, released as `v1.1.0-beta.1` (pre-release, Beta channel only; Stable “latest” is still 1.0.0)**:
 startup check of the GitHub Releases, “new version” bar in the main window, *Updates* card in Settings (status,
@@ -54,6 +54,11 @@ for quotes in the install folder, and the CI on Node 24 actions (this release is
 job). 68 unit tests pass. The window was checked on screen through a harness (A4 and a 55 × 85 mm card, light/dark,
 English/French) and validated by the author, including a print to Microsoft Print to PDF matching the preview. This
 PC has no label printer (only Fax, Print to PDF, XPS Writer, OneNote).
+
+**On `main`, not released yet** (after 1.2.0-beta.1): a **Theme** card in Settings (system / light / dark, saved as
+`AppSettings.Theme`, applied live to every window through `Application.ThemeMode` — checked through UI Automation:
+both windows, title bars included, switch at once), and settings of newer versions kept when an older one saves
+(`[JsonExtensionData]`; 1.1.0 and older still drop them, which lost the remembered printer once).
 
 Not verified yet:
 - shipping labels on the label printer from the print window (the main use case): do its label sizes show up in
@@ -85,8 +90,8 @@ dotnet build src\CropPdf                  # build the app only
 dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 ```
 
-- `CROPPDF_THEME=Light|Dark` and `CROPPDF_LANG=en|fr` force the theme / UI language (by default the app
-  follows Windows and the Settings): handy to check both.
+- `CROPPDF_THEME=Light|Dark` and `CROPPDF_LANG=en|fr` force the theme / UI language at startup, over the
+  Settings (by default the app follows them, and Windows when they say “system”): handy to check both.
 - User settings live in `%LOCALAPPDATA%\CropPdf\settings.json`.
 - The context menu can only be tested installed (`dist\CropPdf-Setup-<version>.exe`, UAC prompt).
 - `build.ps1` enters the Visual Studio environment itself (MSVC, CMake, Ninja, makeappx) through vswhere.
@@ -109,7 +114,7 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 | Folder | Role |
 |--------|------|
 | `src/CropPdf.Core` | Pure, tested logic: `CropGeometry` (screen → PDF coordinates), `PdfCropper` (writing with PDFsharp), `OutputPath` (`_crop` name), `PrintLayout` (size/rotation on the sheet), `PrintSchema` (paper sizes from a driver's PrintCapabilities XML, partial paper ticket), `CropAreaTooSmallException`, `SemanticVersion` (SemVer parsing/ordering), `UpdateFeed` (GitHub Releases: parsing, channel choice, download, SHA-256 check). No UI text. |
-| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, updates, print choices), `PrintWindow` + `Printing` (print window, printers, sheet, job), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
+| `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, theme, updates, print choices; unknown keys kept through `[JsonExtensionData]`), `PrintWindow` + `Printing` (print window, printers, sheet, job), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
 | `src/CropPdf.Shell` | C++ DLL (WRL) implementing `IExplorerCommand`: has File Explorer start `CropPdf.exe "<file>"`, located next to it. Localized label in `CropPdfMenu.rc`. |
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
 | `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |

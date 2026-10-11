@@ -13,15 +13,22 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        var settings = AppSettings.Load();
+
         // UI language: the one chosen in the settings, else the Windows one (French, otherwise English).
         // CROPPDF_LANG=en|fr forces one, handy to test both.
         ApplyLanguage(Environment.GetEnvironmentVariable("CROPPDF_LANG") is { Length: > 0 } forced
             ? forced
-            : AppSettings.Load().Language);
+            : settings.Language);
 
-        // The theme follows Windows (light/dark). CROPPDF_THEME=Light|Dark forces one, handy to test both.
-        if (Environment.GetEnvironmentVariable("CROPPDF_THEME") is "Light" or "Dark")
-            ThemeMode = new ThemeMode(Environment.GetEnvironmentVariable("CROPPDF_THEME")!);
+        // Theme: the one chosen in the settings, Windows' light/dark by default.
+        // CROPPDF_THEME=Light|Dark forces one, handy to test both.
+        ApplyTheme(Environment.GetEnvironmentVariable("CROPPDF_THEME") switch
+        {
+            "Light" => AppTheme.Light,
+            "Dark" => AppTheme.Dark,
+            _ => settings.Theme,
+        });
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -46,6 +53,17 @@ public partial class App : Application
         // Once per run (not when the window is rebuilt for a language change); the window shows the offer.
         _ = Updater.CheckAtStartupAsync();
     }
+
+    /// <summary>
+    /// Sets the theme of every window, at once: all colors come from the Fluent theme through DynamicResource.
+    /// </summary>
+    public static void ApplyTheme(AppTheme theme) =>
+        Current.ThemeMode = theme switch
+        {
+            AppTheme.Light => ThemeMode.Light,
+            AppTheme.Dark => ThemeMode.Dark,
+            _ => ThemeMode.System,
+        };
 
     /// <summary>Sets the UI language: <see cref="AppSettings.SystemLanguage"/> or a culture name ("en", "fr").</summary>
     public static void ApplyLanguage(string language)

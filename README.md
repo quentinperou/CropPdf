@@ -31,7 +31,8 @@
   - the printer and paper used last are remembered: printing the next label is one click (or `Enter`);
   - *More settings…* opens the Windows print dialog for the printer's own options (copies, cutting…).
 - Lossless: text stays selectable and vector graphics stay vector.
-- Windows 11 look (Fluent, Mica) that **follows the light/dark theme** and the accent color of Windows.
+- Windows 11 look (Fluent, Mica) that **follows the light/dark theme** and the accent color of Windows; the theme
+  can also be set to light or dark in **Settings**.
 - **English and French**: the app, the context menu and the installer follow the Windows display language;
   the app language can also be chosen in **Settings** (gear icon).
 - **Updates in one click**: at startup the app checks the GitHub Releases and offers the new version, which

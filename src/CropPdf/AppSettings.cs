@@ -5,6 +5,14 @@ using CropPdf.Core;
 
 namespace CropPdf;
 
+/// <summary>Light or dark appearance; <see cref="System"/> follows Windows.</summary>
+public enum AppTheme
+{
+    System,
+    Light,
+    Dark,
+}
+
 /// <summary>User preferences, saved in %LOCALAPPDATA%\CropPdf\settings.json.</summary>
 public sealed class AppSettings
 {
@@ -19,6 +27,9 @@ public sealed class AppSettings
 
     /// <summary><see cref="SystemLanguage"/> or one of <see cref="SupportedLanguages"/>.</summary>
     public string Language { get; set; } = SystemLanguage;
+
+    [JsonConverter(typeof(JsonStringEnumConverter<AppTheme>))]
+    public AppTheme Theme { get; set; } = AppTheme.System;
 
     /// <summary>Print mode used last, preselected in the print window.</summary>
     [JsonConverter(typeof(JsonStringEnumConverter<PrintScaling>))]
@@ -36,6 +47,10 @@ public sealed class AppSettings
     /// <summary>Releases offered as updates: stable only, or betas too.</summary>
     [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
     public UpdateChannel UpdateChannel { get; set; } = UpdateChannel.Stable;
+
+    // Settings of a newer version (a dev build, a beta) are written back as they are, not dropped.
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? OtherSettings { get; set; }
 
     // A missing or damaged file just means default settings: preferences are never worth an error message.
     public static AppSettings Load()
