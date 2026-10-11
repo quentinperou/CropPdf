@@ -12,6 +12,10 @@
   <a href="README.md">English</a> · <b>Français</b>
 </p>
 
+<p align="center">
+  <img src=".github/screenshot.fr.png" width="900" alt="Recadrer un PDF : l'étiquette d'une feuille A4 sélectionnée, prête à être enregistrée ou imprimée seule">
+</p>
+
 ---
 
 ## Fonctionnalités

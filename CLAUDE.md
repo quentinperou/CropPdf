@@ -58,7 +58,12 @@ PC has no label printer (only Fax, Print to PDF, XPS Writer, OneNote).
 **`v1.2.0-beta.2` (pre-release, Beta channel)**: everything in 1.2.0-beta.1, plus a **Theme** card in Settings (system / light / dark, saved as
 `AppSettings.Theme`, applied live to every window through `Application.ThemeMode` — checked through UI Automation:
 both windows, title bars included, switch at once), and settings of newer versions kept when an older one saves
-(`[JsonExtensionData]`; 1.1.0 and older still drop them, which lost the remembered printer once).
+(`[JsonExtensionData]`; 1.1.0 and older still drop them, which lost the remembered printer once). Closes issue #1.
+
+**On `main`, not released yet** (after 1.2.0-beta.2): a screenshot at the top of both READMEs
+(`.github/screenshot.png`, `.github/screenshot.fr.png`: a fictitious A4 shipping sheet with its label selected,
+1100 × 820 window, light theme), and an app icon whose small sizes (16–40 px) fill the whole square and are
+pixel-snapped, like PageCompose's (the author found it smaller than PageCompose's in the Start menu).
 
 Not verified yet:
 - shipping labels on the label printer from the print window (the main use case): do its label sizes show up in
@@ -118,7 +123,7 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 | `src/CropPdf.Shell` | C++ DLL (WRL) implementing `IExplorerCommand`: has File Explorer start `CropPdf.exe "<file>"`, located next to it. Localized label in `CropPdfMenu.rc`. |
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
 | `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |
-| `scripts/` | `build.ps1`, `make-icons.ps1` (regenerates the `.ico` and logos; the generated files are committed). |
+| `scripts/` | `build.ps1`, `make-icons.ps1` (regenerates the `.ico` and logos; the generated files are committed; `.ico` sizes up to 40 px fill the whole square with pixel-snapped lines, larger ones keep a 4 % margin, as in PageCompose). |
 | `.github/workflows/build.yml` | CI: build + tests on every push; on a `v*` tag, publishes the installer in a Release (the installer goes from the Windows job to the release job as an artifact, uploaded for tags only and kept 1 day). Actions on their Node 24 majors (checkout v7, setup-dotnet v6, upload-artifact v7, download-artifact v8, action-gh-release v3). |
 | `docs/` | Icon used by the README. |
 | `tools/` | Dev tools: `SamplePdf` (test PDF), `InvokeMenu` (runs the installed menu command). Not in the solution. |
@@ -260,7 +265,11 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 - A selection cannot be drawn with posted mouse messages (WPF checks the real button state). To look at the print
   window without drawing, use a small harness project (outside the repo) that references `src\CropPdf\CropPdf.csproj`,
   creates an `Application` with `ThemeMode`, loads a `PdfPageRenderer` and shows `new PrintWindow(new PrintRequest(...))`;
-  give it `<ApplicationIcon>` (windows take the exe's icon) and capture it with `PrintWindow`.
+  give it `<ApplicationIcon>` (windows take the exe's icon) and capture it with `PrintWindow`. For the main window
+  (README screenshots): `new MainWindow()`, `OpenAsync`, then set `Selection` on the first item of the private
+  `_pages` collection through reflection; the harness must also embed `Assets/CropPdf.ico` as a `<Resource>` (the
+  relative pack URI of `MainWindow.Icon` resolves against the entry assembly, and `Application.ResourceAssembly`
+  cannot be changed once WPF has set it).
 
 ## Debugging the context menu
 

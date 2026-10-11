@@ -22,7 +22,8 @@ function New-RoundedRectPath([System.Drawing.RectangleF]$r, [float]$radius) {
 }
 
 # Blue rounded square with the classic "crop" mark (two interlocking L shapes) in white.
-function New-IconBitmap([int]$size, [float]$padding = 0.04) {
+# -Hinted (small sizes): lines of a whole number of pixels, snapped to the pixel grid, so that they stay sharp.
+function New-IconBitmap([int]$size, [float]$padding = 0.04, [switch]$Hinted) {
     $bmp = New-Object System.Drawing.Bitmap $size, $size, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
@@ -38,12 +39,18 @@ function New-IconBitmap([int]$size, [float]$padding = 0.04) {
     $brush = New-Object System.Drawing.Drawing2D.LinearGradientBrush $rect, $c1, $c2, ([float]45)
     $g.FillPath($brush, $bg)
 
-    $w = [float][Math]::Max(1.6, $s * 0.10)
+    $w = if ($Hinted) { [float][Math]::Max(2, [Math]::Round($s * 0.10)) } else { [float][Math]::Max(1.6, $s * 0.10) }
     $pen = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), $w
     $pen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
     $pen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
     $pen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
-    function P([float]$x, [float]$y) { New-Object System.Drawing.PointF ($m + $x * $s), ($m + $y * $s) }
+    # With PixelOffsetMode.HighQuality pixel i covers [i, i + 1]: an odd width is centered on .5, an even one on whole.
+    $snap = if ([int]$w % 2) { 0.5 } else { 0.0 }
+    function C([float]$v) {
+        $c = $m + $v * $s
+        if ($Hinted) { [float]([Math]::Round($c - $snap) + $snap) } else { [float]$c }
+    }
+    function P([float]$x, [float]$y) { New-Object System.Drawing.PointF (C $x), (C $y) }
     $g.DrawLines($pen, [System.Drawing.PointF[]]@((P 0.34 0.18), (P 0.34 0.66), (P 0.82 0.66)))
     $g.DrawLines($pen, [System.Drawing.PointF[]]@((P 0.18 0.34), (P 0.66 0.34), (P 0.66 0.82)))
 
@@ -64,9 +71,14 @@ function Save-Png([int]$size, [string]$path, [float]$padding = 0.04) {
     Write-Host "  $path"
 }
 
-# ICO file made of PNG-compressed entries (supported since Windows Vista).
+# ICO file made of PNG-compressed entries (supported since Windows Vista). The small sizes (taskbar, Start menu,
+# File Explorer) fill the whole square, like other Windows 11 app icons; from 48 px on, a 4 % margin is kept.
 function Save-Ico([int[]]$sizes, [string]$path) {
-    $images = foreach ($size in $sizes) { $b = New-IconBitmap $size; , (Get-PngBytes $b); $b.Dispose() }
+    $images = foreach ($size in $sizes) {
+        $b = if ($size -le 40) { New-IconBitmap $size 0 -Hinted } else { New-IconBitmap $size }
+        , (Get-PngBytes $b)
+        $b.Dispose()
+    }
     $fs = [System.IO.File]::Create($path)
     $bw = New-Object System.IO.BinaryWriter $fs
     $bw.Write([UInt16]0); $bw.Write([UInt16]1); $bw.Write([UInt16]$sizes.Count)

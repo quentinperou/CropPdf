@@ -12,6 +12,10 @@
   <b>English</b> · <a href="README.fr.md">Français</a>
 </p>
 
+<p align="center">
+  <img src=".github/screenshot.png" width="900" alt="Crop PDF: the shipping label of an A4 sheet selected, ready to be saved or printed on its own">
+</p>
+
 ---
 
 ## Features
