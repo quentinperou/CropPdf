@@ -149,6 +149,9 @@ Les {2} autres pages seront supprimées définitivement.
   <data name="SettingsThemeDescription" xml:space="preserve">
     <value>Apparence claire ou sombre. Le mode automatique suit celui de Windows.</value>
   </data>
+  <data name="ContextMenuLabel" xml:space="preserve">
+    <value>Recadrer le PDF</value>
+  </data>
   <data name="SettingsContextMenu" xml:space="preserve">
     <value>Afficher dans le menu clic droit de Windows 11</value>
   </data>

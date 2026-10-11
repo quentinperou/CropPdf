@@ -30,6 +30,8 @@ public partial class App : Application
             _ => settings.Theme,
         });
 
+        ContextMenuSetting.Sync();
+
         DispatcherUnhandledException += (_, args) =>
         {
             MessageBox.Show(args.Exception.Message, Strings.Get("AppTitle"), MessageBoxButton.OK, MessageBoxImage.Error);

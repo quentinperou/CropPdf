@@ -12,8 +12,9 @@ The user draws a rectangle on a page; the saved file contains **only that page**
 
 ## Project status (October 11, 2026)
 
-**Latest release: `v1.2.0` (stable)**, on top of 1.1.0: print window with live preview, theme setting, Windows 11
-context menu switch, uninstall removing the user data, sharper small icons. History below.
+**Latest release: `v1.2.1` (stable)**: 1.2.0 (on top of 1.1.0: print window with live preview, theme setting,
+Windows 11 context menu switch, uninstall removing the user data, sharper small icons) plus the fix of the duplicate
+entry in “Show more options”. History below.
 
 **Version 1.0.0 works end to end**, developed and tested on Windows 11 (build 26200): full build, install,
 context-menu package registration (`Status : Ok`), menu command invoked the way File Explorer does (the app opens
@@ -67,8 +68,8 @@ both windows, title bars included, switch at once), and settings of newer versio
 fill the whole square and are pixel-snapped, like PageCompose's (the author found it smaller than PageCompose's in
 the Start menu), the Settings switch **“Show in the Windows 11 right-click menu”** (Windows 11 only) —
 the DLL's `GetState` returns `ECS_HIDDEN` (2) when `HKCU\Software\CropPdf\ShowInContextMenu` = 0, checked by
-loading the built DLL directly and calling `GetState` for a missing value / 0 / 1 (0, 2, 0); not yet tried in the
-real menu — and the **uninstaller deleting the user data** of the uninstalling account (`%LOCALAPPDATA%\CropPdf`,
+loading the built DLL directly and calling `GetState` for a missing value / 0 / 1 (0, 2, 0), then in the real menu
+with 1.2.1 — and the **uninstaller deleting the user data** of the uninstalling account (`%LOCALAPPDATA%\CropPdf`,
 `%TEMP%\CropPdf-Update`, `HKCU\Software\CropPdf`). **Uninstall verified on October 11, 2026** (install of a local
 build, then uninstall, with the uninstall log): directly with `/LOG` (the existing settings folder was deleted) and
 from Windows Settings (cleanup step run with the right paths); afterwards nothing of Crop PDF was left (install
@@ -90,13 +91,18 @@ Not verified yet:
   the UAC prompt (“not installed” message), and the relaunched app being unelevated (`runasoriginaluser`, not
   checked: the app was already closed when looked at).
 
+**`v1.2.1` (stable, “latest”)**: fix of the duplicate “Crop PDF” in “Show more options” on Windows 11 (see
+“Classic entry” under Technical choices), with the per-user classic entry while the Windows 11 entry is hidden;
+uninstall also deletes that per-user entry and the fallback HKLM entry. **Checked installed by the author on
+Windows 11**: one entry in each menu; switch off → none in the new menu, one under “Show more options”; switch on
+→ back to one in each.
+
 Next steps:
-1. On the label printer's PC: install or update to 1.2.0, then print shipping labels from the print window; fix
-   in a 1.2.1 if needed (offered to everyone by the app).
-2. Try the “Show in the Windows 11 right-click menu” switch in the real menu.
-3. On the next release, update an installed 1.2.0 from its own Settings: checks the Restart Manager path and the
+1. On the label printer's PC: install or update to 1.2.1, then print shipping labels from the print window; fix
+   in a 1.2.2 if needed (offered to everyone by the app).
+2. On the next release, update an installed 1.2.1 from its own Settings: checks the Restart Manager path and the
    relaunch; also try declining the UAC prompt once.
-4. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
+3. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
 
 ## Commands
 
@@ -148,10 +154,16 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   external location): `Publisher` contains the OID `2.25.311729368913984317654407730594956997722=1` and the
   installer runs `Add-AppxPackage -ExternalLocation <folder> -AllowUnsigned` as administrator. No certificate
   to buy or trust. Future option: free signing through SignPath Foundation (open source projects).
-- **Classic entry as well** (HKLM `SystemFileAssociations\.pdf\shell\CropPdf`): Windows 10 and “Show more options”.
+- **Classic entry (HKLM `SystemFileAssociations\.pdf\shell\CropPdf`) on Windows 10 only.** On Windows 11,
+  “Show more options” also lists the commands of the package: a classic entry made “Crop PDF” show **twice** there
+  (bug of 1.0.0–1.2.0, fixed in 1.2.1; PowerToys' File Locksmith has the same duplicate). So on Windows 11 the
+  installer writes no classic entry (`Check: not IsWindows11`), deletes the one of older versions once the package
+  is registered, and writes it from code (`WriteClassicVerb`) only as a fallback when the registration fails.
 - **Hiding the Windows 11 entry** (Settings switch, per user): the DLL's `GetState` reads
-  `HKCU\Software\CropPdf\ShowInContextMenu` at every right-click and returns `ECS_HIDDEN` for 0 — no admin rights,
-  no re-registration, immediate. The classic entry is not affected (it stays the fallback).
+  `HKCU\Software\CropPdf\ShowInContextMenu` at every right-click and returns `ECS_HIDDEN` for 0, which hides it in
+  both menus — no admin rights, no re-registration, immediate. While it is hidden, the app writes a classic entry
+  for that user (same key under HKCU, `ContextMenuSetting`), so “Crop PDF” stays under “Show more options”; it is
+  removed when the switch is turned on again, and put back in line at every startup (`ContextMenuSetting.Sync`).
 - **WPF + built-in Fluent theme** (`Application.ThemeMode="System"`) rather than WinUI 3: Windows 11 look
   (Mica, light/dark, accent) without the complexity of the Windows App SDK. `ThemeMode` is flagged as
   experimental (warning WPF0001 silenced in the csproj).
@@ -248,7 +260,11 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 - **CLSID `5C9B0CAD-9A30-49DA-827A-1672AC5D7FB8`**: in `dllmain.cpp` *and* `AppxManifest.xml`. The package name
   `CropPdf.ContextMenu`: in `AppxManifest.xml` *and* `CropPdf.iss`. The key `HKCU\Software\CropPdf` and value
-  `ShowInContextMenu`: in `dllmain.cpp`, `ContextMenuSetting.cs` *and* `CropPdf.iss` (uninstall). Keep them in sync.
+  `ShowInContextMenu`: in `dllmain.cpp`, `ContextMenuSetting.cs` *and* `CropPdf.iss` (uninstall). The classic entry
+  key `Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf` and its values: in `CropPdf.iss` (`ClassicVerbKey`,
+  `[Registry]`, `WriteClassicVerb`) *and* `ContextMenuSetting.cs`. Keep them in sync.
+- **Windows 11 shows packaged context menu commands in “Show more options” too**: never add a classic verb for the
+  same command there (duplicate entry).
 - Inno Setup: a line starting with `[` is read as a section header, even indented inside `[Code]`.
 - Inno Setup → PowerShell: never put a path inside the `-Command` text (a `'` or a typographic `’` in the folder
   name ends PowerShell's quoted string); pass it through an environment variable (`SetEnvironmentVariableW`,
@@ -295,7 +311,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   (`Crop PDF.lnk` / `Recadrer un PDF.lnk` under ProgramData), the Uninstall key
   `{15AB190D-5F97-4B46-A972-C78CDA430D5C}_is1`, `HKLM\Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf`,
   `Get-AppxPackage CropPdf.ContextMenu`, `%LOCALAPPDATA%\Packages\CropPdf.ContextMenu_*`, `%LOCALAPPDATA%\CropPdf`,
-  `%TEMP%\CropPdf-Update`, `HKCU\Software\CropPdf`, `PendingFileRenameOperations` entries.
+  `%TEMP%\CropPdf-Update`, `HKCU\Software\CropPdf`, `HKCU\Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf`,
+  `PendingFileRenameOperations` entries.
 - Uninstall log: `unins000.exe /LOG="<file>"`, or build with `ISCC /DUninstallLog` (then even an uninstall started
   from Windows Settings writes `%TEMP%\Uninstall Log <date> #nnn.txt`). `DeleteUserData` logs what it deletes.
 

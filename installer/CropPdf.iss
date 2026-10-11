@@ -17,6 +17,8 @@
 #define AppName "Crop PDF"
 #define AppExe "CropPdf.exe"
 #define PackageName "CropPdf.ContextMenu"
+; Classic menu entry (same key in src\CropPdf\ContextMenuSetting.cs, under HKCU).
+#define ClassicVerbKey "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"
 
 [Setup]
 AppId={{15AB190D-5F97-4B46-A972-C78CDA430D5C}
@@ -81,13 +83,14 @@ Source: "..\dist\CropPdf.Menu.msix"; DestDir: "{app}"; Flags: ignoreversion
 Name: "{autoprograms}\{cm:StartMenuName}"; Filename: "{app}\{#AppExe}"
 
 [Registry]
-; Classic menu entry: the whole menu on Windows 10, "Show more options" on Windows 11.
+; Classic menu entry, on Windows 10 only: on Windows 11, "Show more options" already lists the entry of the
+; package (new menu), so a classic entry would show "Crop PDF" twice (see RegisterContextMenu for its fallback).
 ; MUIVerb points at the localized string table of the DLL (IDS_MENU_TITLE = 101), so the label follows
 ; each user's display language; the default value is a fallback in the installer's language.
-Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"; ValueType: string; ValueName: ""; ValueData: "{cm:MenuLabel}"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"; ValueType: string; ValueName: "MUIVerb"; ValueData: "@{app}\CropPdfMenu.dll,-101"
-Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#AppExe}"",0"
-Root: HKLM; Subkey: "Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExe}"" ""%1"""
+Root: HKLM; Subkey: "{#ClassicVerbKey}"; ValueType: string; ValueName: ""; ValueData: "{cm:MenuLabel}"; Flags: uninsdeletekey; Check: not IsWindows11
+Root: HKLM; Subkey: "{#ClassicVerbKey}"; ValueType: string; ValueName: "MUIVerb"; ValueData: "@{app}\CropPdfMenu.dll,-101"; Check: not IsWindows11
+Root: HKLM; Subkey: "{#ClassicVerbKey}"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#AppExe}"",0"; Check: not IsWindows11
+Root: HKLM; Subkey: "{#ClassicVerbKey}\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExe}"" ""%1"""; Check: not IsWindows11
 
 [Run]
 ; Update installed from the app (silent, /RELAUNCH=1): start the app again, as the user, not elevated.
@@ -126,6 +129,15 @@ end;
 function SetEnvironmentVariable(Name, Value: String): BOOL;
   external 'SetEnvironmentVariableW@kernel32.dll stdcall';
 
+{ The classic entry of the [Registry] section, for Windows 11 when the package could not be registered. }
+procedure WriteClassicVerb;
+begin
+  RegWriteStringValue(HKLM, '{#ClassicVerbKey}', '', CustomMessage('MenuLabel'));
+  RegWriteStringValue(HKLM, '{#ClassicVerbKey}', 'MUIVerb', ExpandConstant('@{app}\CropPdfMenu.dll,-101'));
+  RegWriteStringValue(HKLM, '{#ClassicVerbKey}', 'Icon', ExpandConstant('"{app}\{#AppExe}",0'));
+  RegWriteStringValue(HKLM, '{#ClassicVerbKey}\command', '', ExpandConstant('"{app}\{#AppExe}" "%1"'));
+end;
+
 procedure RegisterContextMenu;
 begin
   { The paths reach PowerShell through environment variables (inherited by the child process), not inside the
@@ -133,8 +145,14 @@ begin
     quote) would end a quoted string and break the command. }
   SetEnvironmentVariable('CROPPDF_MSIX', ExpandConstant('{app}\CropPdf.Menu.msix'));
   SetEnvironmentVariable('CROPPDF_LOCATION', ExpandConstant('{app}'));
-  if not RunPowerShell('Add-AppxPackage -Path $env:CROPPDF_MSIX -ExternalLocation $env:CROPPDF_LOCATION -AllowUnsigned') then
+  if RunPowerShell('Add-AppxPackage -Path $env:CROPPDF_MSIX -ExternalLocation $env:CROPPDF_LOCATION -AllowUnsigned') then
+    { The package's entry also shows in "Show more options": drop the classic entry of versions up to 1.2.0. }
+    RegDeleteKeyIncludingSubkeys(HKLM, '{#ClassicVerbKey}')
+  else
+  begin
+    WriteClassicVerb;
     MsgBox(CustomMessage('MenuNotRegistered'), mbInformation, MB_OK);
+  end;
 end;
 
 { The app is framework-dependent: it needs the .NET 10 Desktop Runtime. }
@@ -196,13 +214,20 @@ begin
   Log(Format('  settings deleted: %d', [Ord(DelTree(Settings, True, True, True))]));
   Log(Format('  downloads deleted: %d', [Ord(DelTree(Downloads, True, True, True))]));
   Log(Format('  registry key deleted: %d', [Ord(RegDeleteKeyIncludingSubkeys(HKCU, 'Software\CropPdf'))]));
+  { The classic entry the app adds for this user while the Windows 11 entry is hidden (ContextMenuSetting.cs). }
+  Log(Format('  user classic entry deleted: %d', [Ord(RegDeleteKeyIncludingSubkeys(HKCU, '{#ClassicVerbKey}'))]));
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   Log(Format('Uninstall step %d', [Ord(CurUninstallStep)]));
-  if (CurUninstallStep = usUninstall) and IsWindows11 then
-    UnregisterContextMenu
+  if CurUninstallStep = usUninstall then
+  begin
+    if IsWindows11 then
+      UnregisterContextMenu;
+    { The fallback classic entry of WriteClassicVerb is not in the uninstall log. }
+    RegDeleteKeyIncludingSubkeys(HKLM, '{#ClassicVerbKey}');
+  end
   else if CurUninstallStep = usPostUninstall then
     DeleteUserData;
 end;
