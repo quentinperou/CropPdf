@@ -47,6 +47,11 @@ CloseApplications=yes
 RestartApplications=no
 ; Only ask for the language when Windows uses one the installer does not have.
 ShowLanguageDialog=auto
+#ifdef UninstallLog
+; Checking the uninstall (ISCC /DUninstallLog): the uninstaller always writes "Uninstall Log ....txt" in %TEMP%,
+; also when started from Windows Settings, which passes no /LOG.
+UninstallLogging=yes
+#endif
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -175,8 +180,29 @@ begin
   end;
 end;
 
+{ What the app creates for the user who runs it, removed for the account that uninstalls: the settings
+  (settings.json), a downloaded update installer, and the "Show in the Windows 11 context menu" setting.
+  Updates do not uninstall, so they keep all this. Other accounts of the PC keep their own (not reachable here),
+  as does the original user when the UAC prompt was answered with another administrator account. }
+procedure DeleteUserData;
+var
+  Settings, Downloads: String;
+begin
+  { Logged with unins000.exe /LOG="<file>". }
+  Settings := ExpandConstant('{localappdata}\CropPdf');
+  Downloads := ExpandConstant('{%TEMP}\CropPdf-Update');
+  Log(Format('Deleting user data: %s (exists: %d), %s (exists: %d), HKCU\Software\CropPdf', [Settings,
+    Ord(DirExists(Settings)), Downloads, Ord(DirExists(Downloads))]));
+  Log(Format('  settings deleted: %d', [Ord(DelTree(Settings, True, True, True))]));
+  Log(Format('  downloads deleted: %d', [Ord(DelTree(Downloads, True, True, True))]));
+  Log(Format('  registry key deleted: %d', [Ord(RegDeleteKeyIncludingSubkeys(HKCU, 'Software\CropPdf'))]));
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
+  Log(Format('Uninstall step %d', [Ord(CurUninstallStep)]));
   if (CurUninstallStep = usUninstall) and IsWindows11 then
-    UnregisterContextMenu;
+    UnregisterContextMenu
+  else if CurUninstallStep = usPostUninstall then
+    DeleteUserData;
 end;

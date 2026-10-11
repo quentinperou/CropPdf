@@ -21,6 +21,7 @@
 ## Fonctionnalités
 
 - **Clic droit sur un PDF → « Recadrer le PDF »**, dans le nouveau menu contextuel de Windows 11 (et dans « Afficher plus d'options » / sous Windows 10).
+  L'entrée du nouveau menu peut être désactivée dans les **Paramètres** ; elle reste alors dans « Afficher plus d'options ».
 - Toutes les pages s'affichent : on **trace un rectangle** sur la page voulue, puis on peut le déplacer et le redimensionner par ses poignées.
 - Deux façons d'enregistrer :
   - **Enregistrer une copie** : crée `nom_crop.pdf` à côté de l'original (`nom_crop_2.pdf`… si le nom est déjà pris) ;
@@ -78,7 +79,9 @@ Pour mettre à jour : l'appli propose elle-même les nouvelles versions (bandeau
 une seule requête à GitHub (`api.github.com`) au démarrage, sans donnée personnelle, et peut être désactivée
 dans les Paramètres.
 
-Pour l'enlever : **Paramètres → Applications → Applications installées → Crop PDF**.
+Pour l'enlever : **Paramètres → Applications → Applications installées → Crop PDF**. Tout part : l'application,
+les entrées du menu clic droit et, pour le compte qui désinstalle, les réglages de l'appli. Le .NET Desktop Runtime
+reste (d'autres applications peuvent s'en servir).
 
 **Configuration requise :** Windows 11 x64 pour le nouveau menu contextuel (Windows 10 2004+ fonctionne, avec l'entrée dans le menu classique).
 

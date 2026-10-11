@@ -149,6 +149,12 @@ Les {2} autres pages seront supprimées définitivement.
   <data name="SettingsThemeDescription" xml:space="preserve">
     <value>Apparence claire ou sombre. Le mode automatique suit celui de Windows.</value>
   </data>
+  <data name="SettingsContextMenu" xml:space="preserve">
+    <value>Afficher dans le menu clic droit de Windows 11</value>
+  </data>
+  <data name="SettingsContextMenuDescription" xml:space="preserve">
+    <value>Ajoute « Recadrer le PDF » au menu clic droit des fichiers PDF. L&apos;entrée reste de toute façon disponible dans « Afficher plus d&apos;options ».</value>
+  </data>
   <data name="ThemeSystem" xml:space="preserve">
     <value>Thème du système (automatique)</value>
   </data>

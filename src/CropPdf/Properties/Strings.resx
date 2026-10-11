@@ -149,6 +149,12 @@ Overwrite the original file?</value>
   <data name="SettingsThemeDescription" xml:space="preserve">
     <value>Light or dark appearance. Automatic follows Windows.</value>
   </data>
+  <data name="SettingsContextMenu" xml:space="preserve">
+    <value>Show in the Windows 11 right-click menu</value>
+  </data>
+  <data name="SettingsContextMenuDescription" xml:space="preserve">
+    <value>Adds “Crop PDF” to the right-click menu of PDF files. It stays available under “Show more options” anyway.</value>
+  </data>
   <data name="ThemeSystem" xml:space="preserve">
     <value>System theme (automatic)</value>
   </data>

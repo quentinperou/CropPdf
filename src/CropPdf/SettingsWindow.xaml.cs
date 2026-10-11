@@ -27,6 +27,9 @@ public partial class SettingsWindow : Window
         ThemeBox.Items.Add(new ThemeOption(AppTheme.Dark, Strings.Get("ThemeDark")));
         ThemeBox.SelectedItem = ThemeBox.Items.Cast<ThemeOption>().First(o => o.Theme == _settings.Theme);
 
+        ContextMenuCard.Visibility = ContextMenuSetting.IsAvailable ? Visibility.Visible : Visibility.Collapsed;
+        ContextMenuBox.IsChecked = ContextMenuSetting.Show;
+
         ChannelBox.Items.Add(new ChannelOption(UpdateChannel.Stable, Strings.Get("UpdateChannelStable")));
         ChannelBox.Items.Add(new ChannelOption(UpdateChannel.Beta, Strings.Get("UpdateChannelBeta")));
         ChannelBox.SelectedItem = ChannelBox.Items.Cast<ChannelOption>().First(o => o.Channel == _settings.UpdateChannel);
@@ -71,6 +74,10 @@ public partial class SettingsWindow : Window
         _settings.Save();
         App.ApplyTheme(option.Theme);
     }
+
+    // Takes effect at the next right-click: the shell extension reads the setting each time the menu opens.
+    private void ContextMenu_Click(object sender, RoutedEventArgs e) =>
+        ContextMenuSetting.Show = ContextMenuBox.IsChecked == true;
 
     // ---------------------------------------------------------------- Updates
 

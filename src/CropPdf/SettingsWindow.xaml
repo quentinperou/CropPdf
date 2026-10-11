@@ -110,6 +110,20 @@
       </DockPanel>
     </Border>
 
+    <!-- Windows 11 only (hidden on Windows 10, which has no new context menu). -->
+    <Border x:Name="ContextMenuCard" Style="{StaticResource Card}">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Left" Style="{StaticResource CardIcon}" Text="&#xE7AC;" />
+        <CheckBox x:Name="ContextMenuBox" DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                  VerticalAlignment="Center" Margin="16,0,0,0" Click="ContextMenu_Click"
+                  AutomationProperties.Name="{local:Tr SettingsContextMenu}" />
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock Text="{local:Tr SettingsContextMenu}" />
+          <TextBlock Style="{StaticResource CardDescription}" Text="{local:Tr SettingsContextMenuDescription}" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
     <!-- Updates: status and check/install button, then the startup check and the channel. -->
     <Border Style="{StaticResource Card}" Padding="0">
       <StackPanel>

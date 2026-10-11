@@ -12,4 +12,4 @@ target_compile_features(CropPdfMenu PRIVATE cxx_std_20)
 target_compile_definitions(CropPdfMenu PRIVATE UNICODE _UNICODE NOMINMAX)
 # C4324 (structure padded due to alignment) comes from the WRL headers themselves.
 target_compile_options(CropPdfMenu PRIVATE /W4 /WX /wd4324 /permissive- /EHsc /utf-8)
-target_link_libraries(CropPdfMenu PRIVATE runtimeobject shlwapi ole32 oleaut32 uuid)
+target_link_libraries(CropPdfMenu PRIVATE runtimeobject shlwapi ole32 oleaut32 uuid advapi32)

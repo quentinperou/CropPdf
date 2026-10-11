@@ -64,6 +64,16 @@ both windows, title bars included, switch at once), and settings of newer versio
 (`.github/screenshot.png`, `.github/screenshot.fr.png`: a fictitious A4 shipping sheet with its label selected,
 1100 × 820 window, light theme), and an app icon whose small sizes (16–40 px) fill the whole square and are
 pixel-snapped, like PageCompose's (the author found it smaller than PageCompose's in the Start menu).
+Also on `main`, not released: the Settings switch **“Show in the Windows 11 right-click menu”** (Windows 11 only) —
+the DLL's `GetState` returns `ECS_HIDDEN` (2) when `HKCU\Software\CropPdf\ShowInContextMenu` = 0, checked by
+loading the built DLL directly and calling `GetState` for a missing value / 0 / 1 (0, 2, 0); not yet tried in the
+real menu — and the **uninstaller deleting the user data** of the uninstalling account (`%LOCALAPPDATA%\CropPdf`,
+`%TEMP%\CropPdf-Update`, `HKCU\Software\CropPdf`). **Uninstall verified on October 11, 2026** (install of a local
+build, then uninstall, with the uninstall log): directly with `/LOG` (the existing settings folder was deleted) and
+from Windows Settings (cleanup step run with the right paths); afterwards nothing of Crop PDF was left (install
+folder, Start menu shortcut, Uninstall key, classic verb, Windows 11 package and its data folder, settings, update
+folder, HKCU key, pending deletions). Kept on purpose: the .NET Desktop Runtime, other accounts' settings. Crop PDF
+is not installed on this PC any more.
 
 Not verified yet:
 - shipping labels on the label printer from the print window (the main use case): do its label sizes show up in
@@ -97,7 +107,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 
 - `CROPPDF_THEME=Light|Dark` and `CROPPDF_LANG=en|fr` force the theme / UI language at startup, over the
   Settings (by default the app follows them, and Windows when they say “system”): handy to check both.
-- User settings live in `%LOCALAPPDATA%\CropPdf\settings.json`.
+- User settings live in `%LOCALAPPDATA%\CropPdf\settings.json`, except “Show in the Windows 11 right-click menu”:
+  `HKCU\Software\CropPdf\ShowInContextMenu` (DWORD, 0 = hidden), because the shell extension reads it.
 - The context menu can only be tested installed (`dist\CropPdf-Setup-<version>.exe`, UAC prompt).
 - `build.ps1` enters the Visual Studio environment itself (MSVC, CMake, Ninja, makeappx) through vswhere.
 - Dev tools (not part of the app, not in the solution):
@@ -122,7 +133,7 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 | `src/CropPdf` | WPF .NET 10. `MainWindow` (open, zoom, render, save, update bar), `SelectionOverlay` (draw/move/resize), `PdfPageRenderer` (rendering through `Windows.Data.Pdf`), `PageItem` (page model), `SettingsWindow` + `AppSettings` (language, theme, updates, print choices; unknown keys kept through `[JsonExtensionData]`), `PrintWindow` + `Printing` (print window, printers, sheet, job), `Updater` (startup check, install), `Localization.cs` (`Strings`, `{local:Tr}`), `Properties/Strings*.resx`. |
 | `src/CropPdf.Shell` | C++ DLL (WRL) implementing `IExplorerCommand`: has File Explorer start `CropPdf.exe "<file>"`, located next to it. Localized label in `CropPdfMenu.rc`. |
 | `package/` | `AppxManifest.xml` of the “sparse” package + logos. Packed by `makeappx` in `build.ps1`. |
-| `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. |
+| `installer/CropPdf.iss` | Inno Setup installer (English/French): copies to Program Files, registers the package, adds the classic verb. Uninstall removes all of that plus, for the uninstalling account, `%LOCALAPPDATA%\CropPdf`, `%TEMP%\CropPdf-Update` and `HKCU\Software\CropPdf` (not the .NET runtime). |
 | `scripts/` | `build.ps1`, `make-icons.ps1` (regenerates the `.ico` and logos; the generated files are committed; `.ico` sizes up to 40 px fill the whole square with pixel-snapped lines, larger ones keep a 4 % margin, as in PageCompose). |
 | `.github/workflows/build.yml` | CI: build + tests on every push; on a `v*` tag, publishes the installer in a Release (the installer goes from the Windows job to the release job as an artifact, uploaded for tags only and kept 1 day). Actions on their Node 24 majors (checkout v7, setup-dotnet v6, upload-artifact v7, download-artifact v8, action-gh-release v3). |
 | `docs/` | Icon used by the README. |
@@ -135,6 +146,9 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   installer runs `Add-AppxPackage -ExternalLocation <folder> -AllowUnsigned` as administrator. No certificate
   to buy or trust. Future option: free signing through SignPath Foundation (open source projects).
 - **Classic entry as well** (HKLM `SystemFileAssociations\.pdf\shell\CropPdf`): Windows 10 and “Show more options”.
+- **Hiding the Windows 11 entry** (Settings switch, per user): the DLL's `GetState` reads
+  `HKCU\Software\CropPdf\ShowInContextMenu` at every right-click and returns `ECS_HIDDEN` for 0 — no admin rights,
+  no re-registration, immediate. The classic entry is not affected (it stays the fallback).
 - **WPF + built-in Fluent theme** (`Application.ThemeMode="System"`) rather than WinUI 3: Windows 11 look
   (Mica, light/dark, accent) without the complexity of the Windows App SDK. `ThemeMode` is flagged as
   experimental (warning WPF0001 silenced in the csproj).
@@ -230,7 +244,8 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
 ## Known pitfalls
 
 - **CLSID `5C9B0CAD-9A30-49DA-827A-1672AC5D7FB8`**: in `dllmain.cpp` *and* `AppxManifest.xml`. The package name
-  `CropPdf.ContextMenu`: in `AppxManifest.xml` *and* `CropPdf.iss`. Keep them in sync.
+  `CropPdf.ContextMenu`: in `AppxManifest.xml` *and* `CropPdf.iss`. The key `HKCU\Software\CropPdf` and value
+  `ShowInContextMenu`: in `dllmain.cpp`, `ContextMenuSetting.cs` *and* `CropPdf.iss` (uninstall). Keep them in sync.
 - Inno Setup: a line starting with `[` is read as a section header, even indented inside `[Code]`.
 - Inno Setup → PowerShell: never put a path inside the `-Command` text (a `'` or a typographic `’` in the folder
   name ends PowerShell's quoted string); pass it through an environment variable (`SetEnvironmentVariableW`,
@@ -270,6 +285,16 @@ dotnet run --project src\CropPdf -- C:\path\to\file.pdf
   `_pages` collection through reflection; the harness must also embed `Assets/CropPdf.ico` as a `<Resource>` (the
   relative pack URI of `MainWindow.Icon` resolves against the entry assembly, and `Application.ResourceAssembly`
   cannot be changed once WPF has set it).
+
+## Checking the uninstall
+
+- Inventory after uninstalling (all must be gone): `C:\Program Files\Crop PDF`, the Start menu shortcut
+  (`Crop PDF.lnk` / `Recadrer un PDF.lnk` under ProgramData), the Uninstall key
+  `{15AB190D-5F97-4B46-A972-C78CDA430D5C}_is1`, `HKLM\Software\Classes\SystemFileAssociations\.pdf\shell\CropPdf`,
+  `Get-AppxPackage CropPdf.ContextMenu`, `%LOCALAPPDATA%\Packages\CropPdf.ContextMenu_*`, `%LOCALAPPDATA%\CropPdf`,
+  `%TEMP%\CropPdf-Update`, `HKCU\Software\CropPdf`, `PendingFileRenameOperations` entries.
+- Uninstall log: `unins000.exe /LOG="<file>"`, or build with `ISCC /DUninstallLog` (then even an uninstall started
+  from Windows Settings writes `%TEMP%\Uninstall Log <date> #nnn.txt`). `DeleteUserData` logs what it deletes.
 
 ## Debugging the context menu
 

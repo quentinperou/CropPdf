@@ -36,6 +36,17 @@ namespace
         return length > 0 ? std::wstring(text, length) : std::wstring(L"Crop PDF");
     }
 
+    // Settings → "Show in the Windows 11 context menu", per user (same key and value as ContextMenuSetting.cs).
+    // Read each time the menu opens, so the change applies at the next right-click; shown when missing.
+    bool HiddenByUser()
+    {
+        DWORD show = 1;
+        DWORD size = sizeof(show);
+        return RegGetValueW(HKEY_CURRENT_USER, L"Software\\CropPdf", L"ShowInContextMenu", RRF_RT_REG_DWORD,
+                   nullptr, &show, &size) == ERROR_SUCCESS
+            && show == 0;
+    }
+
     std::wstring AppPath()
     {
         std::wstring path(MAX_PATH, L'\0');
@@ -160,7 +171,7 @@ public:
 
     IFACEMETHODIMP GetState(IShellItemArray*, BOOL, EXPCMDSTATE* state) override
     {
-        *state = ECS_ENABLED;
+        *state = HiddenByUser() ? ECS_HIDDEN : ECS_ENABLED;
         return S_OK;
     }
 

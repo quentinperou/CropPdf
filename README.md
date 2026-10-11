@@ -21,6 +21,7 @@
 ## Features
 
 - **Right-click a PDF → “Crop PDF”**, in the new Windows 11 context menu (and under “Show more options” / on Windows 10).
+  The entry of the new menu can be turned off in **Settings**; it then stays under “Show more options”.
 - Every page is shown: **draw a rectangle** on the page you want, then move it or resize it with its handles.
 - Two ways to save:
   - **Save a copy**: creates `name_crop.pdf` next to the original (`name_crop_2.pdf`… if the name is taken);
@@ -75,7 +76,8 @@ To update: the app offers new versions itself (a bar at the top of the window, o
 installing one asks for the administrator prompt again. The check sends a single request to GitHub
 (`api.github.com`) at startup, with no personal data, and can be turned off in Settings.
 
-To uninstall: **Settings → Apps → Installed apps → Crop PDF**.
+To uninstall: **Settings → Apps → Installed apps → Crop PDF**. Everything goes: the app, the context menu
+entries and, for the account that uninstalls, the app's settings. The .NET Desktop Runtime stays (other apps may use it).
 
 **Requirements:** Windows 11 x64 for the new context menu (Windows 10 2004+ works, with the entry in the classic menu).
 
