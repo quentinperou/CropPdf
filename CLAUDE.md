@@ -10,7 +10,10 @@ The user draws a rectangle on a page; the saved file contains **only that page**
 `name_crop.pdf` copy or in place of the original. The UI is in English and French. Author:
 [QuentinPerou](https://github.com/quentinperou). Repository: https://github.com/quentinperou/CropPdf (public). Credits wording chosen by the author (bottom of the READMEs): "Developed by QuentinPerou, with Claude Code (Anthropic)"; the About card shows "Developed by QuentinPerou".
 
-## Project status (October 9, 2026)
+## Project status (October 11, 2026)
+
+**Latest release: `v1.2.0` (stable)**, on top of 1.1.0: print window with live preview, theme setting, Windows 11
+context menu switch, uninstall removing the user data, sharper small icons. History below.
 
 **Version 1.0.0 works end to end**, developed and tested on Windows 11 (build 26200): full build, install,
 context-menu package registration (`Status : Ok`), menu command invoked the way File Explorer does (the app opens
@@ -60,11 +63,9 @@ PC has no label printer (only Fax, Print to PDF, XPS Writer, OneNote).
 both windows, title bars included, switch at once), and settings of newer versions kept when an older one saves
 (`[JsonExtensionData]`; 1.1.0 and older still drop them, which lost the remembered printer once). Closes issue #1.
 
-**On `main`, not released yet** (after 1.2.0-beta.2): a screenshot at the top of both READMEs
-(`.github/screenshot.png`, `.github/screenshot.fr.png`: a fictitious A4 shipping sheet with its label selected,
-1100 × 820 window, light theme), and an app icon whose small sizes (16–40 px) fill the whole square and are
-pixel-snapped, like PageCompose's (the author found it smaller than PageCompose's in the Start menu).
-Also on `main`, not released: the Settings switch **“Show in the Windows 11 right-click menu”** (Windows 11 only) —
+**`v1.2.0` (stable, “latest”)**: everything in the 1.2.0 betas, plus an app icon whose small sizes (16–40 px)
+fill the whole square and are pixel-snapped, like PageCompose's (the author found it smaller than PageCompose's in
+the Start menu), the Settings switch **“Show in the Windows 11 right-click menu”** (Windows 11 only) —
 the DLL's `GetState` returns `ECS_HIDDEN` (2) when `HKCU\Software\CropPdf\ShowInContextMenu` = 0, checked by
 loading the built DLL directly and calling `GetState` for a missing value / 0 / 1 (0, 2, 0); not yet tried in the
 real menu — and the **uninstaller deleting the user data** of the uninstalling account (`%LOCALAPPDATA%\CropPdf`,
@@ -73,7 +74,8 @@ build, then uninstall, with the uninstall log): directly with `/LOG` (the existi
 from Windows Settings (cleanup step run with the right paths); afterwards nothing of Crop PDF was left (install
 folder, Start menu shortcut, Uninstall key, classic verb, Windows 11 package and its data folder, settings, update
 folder, HKCU key, pending deletions). Kept on purpose: the .NET Desktop Runtime, other accounts' settings. Crop PDF
-is not installed on this PC any more.
+is not installed on this PC any more. The READMEs have a screenshot at the top (`.github/screenshot.png`,
+`.github/screenshot.fr.png`: a fictitious A4 shipping sheet with its label selected, 1100 × 820 window, light theme).
 
 Not verified yet:
 - shipping labels on the label printer from the print window (the main use case): do its label sizes show up in
@@ -89,11 +91,12 @@ Not verified yet:
   checked: the app was already closed when looked at).
 
 Next steps:
-1. Update the installed 1.1.0-beta.1 (Beta channel) to 1.1.0 from its own Settings: checks the Restart Manager
-   path and the relaunch; also try declining the UAC prompt once.
-2. On the label printer's PC (Crop PDF 1.1.0 installed, Beta channel): update to the latest 1.2.0 beta from the
-   app, then print shipping labels from the print window. If all is well, release the final `v1.2.0`.
-3. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
+1. On the label printer's PC: install or update to 1.2.0, then print shipping labels from the print window; fix
+   in a 1.2.1 if needed (offered to everyone by the app).
+2. Try the “Show in the Windows 11 right-click menu” switch in the real menu.
+3. On the next release, update an installed 1.2.0 from its own Settings: checks the Restart Manager path and the
+   relaunch; also try declining the UAC prompt once.
+4. Later, if the app spreads: code signing through SignPath Foundation (see “To do” → Signing).
 
 ## Commands
 
